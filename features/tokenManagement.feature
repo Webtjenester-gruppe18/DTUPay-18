@@ -4,4 +4,5 @@ Feature: Token Management Features
     Given the customer is registered
     And the customer have 1 unused token left
     When the customer request more tokens
-    Then the customer receive 5 unused tokens
+    Then the service create 5 new unused tokens
+    Then the customer receive the tokens, and have 6 unused tokens

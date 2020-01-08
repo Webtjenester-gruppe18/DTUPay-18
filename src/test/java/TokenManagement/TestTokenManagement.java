@@ -60,8 +60,15 @@ public class TestTokenManagement {
         }
     }
 
-    @Then("the customer receive {int} unused tokens")
-    public void theCustomerReceiveUnusedTokens(Integer amountOfTokensReceived) {
+    @Then("the service create {int} new unused tokens")
+    public void theServiceCreateNewUnusedTokens(Integer amountOfTokensReceived) {
         assertThat(this.requestedTokens.size(), is(equalTo(amountOfTokensReceived)));
+    }
+
+    @Then("the customer receive the tokens, and have {int} unused tokens")
+    public void theCustomerReceiveTheTokensAndHaveUnusedTokens(Integer totalAmountOfTokens) {
+        this.currentCustomer.addTokens(this.requestedTokens);
+
+        assertThat(this.currentCustomer.getTokens().size(), is(equalTo(totalAmountOfTokens)));
     }
 }
