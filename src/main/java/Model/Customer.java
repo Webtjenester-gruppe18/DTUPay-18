@@ -17,4 +17,8 @@ public class Customer extends Person {
     public void setTokens(ArrayList<Token> tokens) {
         this.tokens = tokens;
     }
+
+    public void addTokens(ArrayList<Token> tokens) {
+        this.tokens.addAll(tokens);
+    }
 }

@@ -1,12 +1,14 @@
 package Model;
 
+import java.util.UUID;
+
 public class Token {
 
     private String value;
     private boolean used;
 
-    public Token(String value) {
-        this.value = value;
+    public Token() {
+        this.value = UUID.randomUUID().toString();
         this.used = false;
     }
 
