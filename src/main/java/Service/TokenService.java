@@ -2,7 +2,7 @@ package Service;
 
 import Control.ControlReg;
 import Database.IDatabase;
-import Database.InMemoryDatabase;
+import Exception.TokenValidationException;
 import Model.Token;
 import Exception.TooManyTokensException;
 import java.util.ArrayList;
@@ -34,10 +34,10 @@ public class TokenService {
         return generatedTokens;
     }
 
-    public boolean validateToken(Token token) {
+    public boolean validateToken(Token token) throws TokenValidationException {
 
-        if (isTokenFake(token)) {
-            return false;
+        if (isTokenFake(token) || !token.isValid()) {
+            throw new TokenValidationException("The token is not valid.");
         }
 
         return token.isValid();

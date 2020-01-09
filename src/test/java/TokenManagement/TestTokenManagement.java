@@ -7,7 +7,7 @@ import Control.ControlReg;
 import Exception.TooManyTokensException;
 import Exception.ExceptionContainer;
 import Database.IDatabase;
-import Database.InMemoryDatabase;
+import Exception.TokenValidationException;
 import Model.Customer;
 import Model.Token;
 import Service.TokenService;
@@ -109,12 +109,23 @@ public class TestTokenManagement {
 
     @When("the validation is processing")
     public void theValidationIsProcessing() {
-        this.validationResult = this.tokenService.validateToken(this.token);
+
+        try {
+            this.validationResult = this.tokenService.validateToken(this.token);
+        } catch (TokenValidationException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
     }
 
     @Then("the result is {string}")
     public void theResultIs(String res) {
+
         assertThat(this.validationResult, is(equalTo(Boolean.valueOf(res))));
+    }
+
+    @Then("a errormessage is presented {string}")
+    public void aErrormessageIsPresented(String exceptionMessage) {
+        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(exceptionMessage)));
     }
 
 }

@@ -21,9 +21,9 @@ Feature: Token Management Features
   Scenario: Validate a invalid token
     Given A invalid token
     When the validation is processing
-    Then the result is "false"
+    Then a errormessage is presented "The token is not valid."
 
   Scenario: Validate a fake token
     Given A fake token
     When the validation is processing
-    Then the result is "false"
+    Then a errormessage is presented "The token is not valid."
