@@ -71,4 +71,10 @@ public class TestTokenManagement {
 
         assertThat(this.currentCustomer.getTokens().size(), is(equalTo(totalAmountOfTokens)));
     }
+
+    @Then("the customer gets a error message saying {string}")
+    public void theCustomerGetsAErrorMessageSaying(String errorMessage) {
+        assertThat(this.exceptionContainer.getErrorMessage(), is(equalTo(errorMessage)));
+    }
+
 }
