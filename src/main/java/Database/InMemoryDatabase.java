@@ -15,11 +15,22 @@ public class InMemoryDatabase implements IDatabase {
     public InMemoryDatabase() {
         this.customers = new ArrayList<>();
         this.merchants = new ArrayList<>();
+        this.tokens = new ArrayList<>();
     }
 
     @Override
     public void addCustomer(Customer customer) {
         this.customers.add(customer);
+    }
+
+    @Override
+    public void addToken(Token token) {
+        this.tokens.add(token);
+    }
+
+    @Override
+    public void addSetOfTokens(ArrayList<Token> tokens) {
+        this.tokens.addAll(tokens);
     }
 
     @Override
@@ -30,6 +41,11 @@ public class InMemoryDatabase implements IDatabase {
             }
         }
         return null;
+    }
+
+    @Override
+    public ArrayList<Token> getAllTokens() {
+        return this.tokens;
     }
 
     @Override

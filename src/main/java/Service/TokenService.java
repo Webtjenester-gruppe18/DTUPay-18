@@ -1,5 +1,8 @@
 package Service;
 
+import Control.ControlReg;
+import Database.IDatabase;
+import Database.InMemoryDatabase;
 import Model.Token;
 import Exception.TooManyTokensException;
 import java.util.ArrayList;
@@ -7,6 +10,7 @@ import java.util.ArrayList;
 public class TokenService {
 
     private final int maxAmountOfTokens = 6;
+    private IDatabase database = ControlReg.getDatabase();
 
     public ArrayList<Token> generateTokens(int amount) {
         ArrayList<Token> res = new ArrayList<>();
@@ -31,6 +35,24 @@ public class TokenService {
     }
 
     public boolean validateToken(Token token) {
+
+        if (isTokenFake(token)) {
+            return false;
+        }
+
         return token.isValid();
+    }
+
+    public boolean isTokenFake(Token token) {
+
+        ArrayList<Token> tokens = this.database.getAllTokens();
+
+        for (Token t : tokens) {
+            if (t.getValue().equals(token.getValue())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

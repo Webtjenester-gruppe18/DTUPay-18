@@ -3,6 +3,7 @@ package TokenManagement;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import Control.ControlReg;
 import Exception.TooManyTokensException;
 import Exception.ExceptionContainer;
 import Database.IDatabase;
@@ -29,7 +30,7 @@ public class TestTokenManagement {
 
     @Before
     public void setUp() {
-        this.database = new InMemoryDatabase();
+        this.database = ControlReg.getDatabase();
         this.tokenService = new TokenService();
         this.requestedTokens = new ArrayList<>();
         this.exceptionContainer = new ExceptionContainer();
@@ -83,6 +84,7 @@ public class TestTokenManagement {
     public void aValidToken() {
         ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
         this.token = generatedTokens.get(0);
+        this.database.addToken(this.token);
 
         assertThat(this.token, is(equalTo(generatedTokens.get(0))));
     }
@@ -92,6 +94,15 @@ public class TestTokenManagement {
         ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
         this.token = generatedTokens.get(0);
         this.token.setValid(false);
+        this.database.addToken(this.token);
+
+        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
+    }
+
+    @Given("A fake token")
+    public void aFakeToken() {
+        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
+        this.token = generatedTokens.get(0);
 
         assertThat(this.token, is(equalTo(generatedTokens.get(0))));
     }
