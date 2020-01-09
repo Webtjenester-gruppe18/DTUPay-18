@@ -11,6 +11,7 @@ import Model.Customer;
 import Model.Merchant;
 import Model.Token;
 import Service.TokenService;
+import Service.ValidationService;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -26,13 +27,17 @@ public class TestTokenManagement {
     private Merchant currentMerchant;
     private ArrayList<Token> requestedTokens;
     private ExceptionContainer exceptionContainer;
-    private Token token;
-    private boolean validationResult;
+    private Token paymentToken;
+    private ValidationService validationService;
+    private double paymentPrice;
+    private double customerPreviousBalance;
+    private double merchantPreviousBalance;
 
     @Before
     public void setUp() {
         this.database = ControlReg.getDatabase();
-        this.tokenService = new TokenService();
+        this.tokenService = ControlReg.getTokenService();
+        this.validationService = ControlReg.getValidationService();
         this.requestedTokens = new ArrayList<>();
         this.exceptionContainer = new ExceptionContainer();
     }
@@ -43,14 +48,6 @@ public class TestTokenManagement {
         this.database.addCustomer(currentCustomer);
 
         assertThat(this.database.getCustomer(currentCustomer.getId()), is(equalTo(currentCustomer)));
-    }
-
-    @Given("A merchant that is registered")
-    public void aMerchantThatIsRegistered() {
-        this.currentMerchant = new Merchant("Jane Doe");
-        this.database.addMerchant(this.currentMerchant);
-
-        assertThat(this.database.getMerchant(this.currentMerchant.getId()), is(equalTo(this.currentMerchant)));
     }
 
     @Given("the customer have {int} unused token left")
@@ -89,90 +86,48 @@ public class TestTokenManagement {
         assertThat(this.exceptionContainer.getErrorMessage(), is(equalTo(errorMessage)));
     }
 
-    @Given("A valid token")
-    public void aValidToken() {
-        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
-        this.token = generatedTokens.get(0);
-        this.database.addToken(this.token);
 
-        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
+    @Given("the customer is registered with a account balance {int}")
+    public void theCustomerIsRegisteredWithAAccountBalance(Integer balance) {
+        this.currentCustomer = new Customer("John Doe");
+        this.customerPreviousBalance = balance;
+        this.currentCustomer.getAccount().setBalance(balance);
+        this.database.addCustomer(this.currentCustomer);
+
+        assertThat(this.database.getCustomer(this.currentCustomer.getId()), is(equalTo(this.currentCustomer)));
     }
 
-    @Given("A invalid token")
-    public void aInvalidToken() {
-        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
-        this.token = generatedTokens.get(0);
-        this.token.setValid(false);
-        this.database.addToken(this.token);
+    @Given("A merchant that is registered with a account balance {int}")
+    public void aMerchantThatIsRegisteredWithAAccountBalance(Integer balance) {
+        this.currentMerchant = new Merchant("Jane Doe");
+        this.merchantPreviousBalance = balance;
+        this.currentMerchant.getAccount().setBalance(balance);
+        this.database.addMerchant(this.currentMerchant);
 
-        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
+        assertThat(this.database.getMerchant(this.currentMerchant.getId()), is(equalTo(this.currentMerchant)));
     }
 
-    @Given("A fake token")
-    public void aFakeToken() {
-        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
-        this.token = generatedTokens.get(0);
-
-        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
+    @Given("the customer have at least {int} unused token")
+    public void theCustomerHaveAtLeastUnusedToken(Integer amountOfTokens) {
+        ArrayList<Token> tokens = this.tokenService.generateTokens(amountOfTokens);
+        this.currentCustomer.getTokens().addAll(tokens);
     }
 
-    @When("the validation is processing")
-    public void theValidationIsProcessing() {
-
+    @When("the customer pays the merchant {int} kr")
+    public void theCustomerPaysTheMerchantKr(Integer amount) {
         try {
-            this.validationResult = this.tokenService.validateToken(this.token);
+             this.paymentToken = this.currentCustomer.getTokens().get(0);
+             this.paymentPrice = amount;
+             this.tokenService.makePayment(amount, this.currentCustomer, this.currentMerchant, this.currentCustomer.getTokens().get(0));
         } catch (TokenValidationException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
 
-    @Then("the result is {string}")
-    public void theResultIs(String res) {
-
-        assertThat(this.validationResult, is(equalTo(Boolean.valueOf(res))));
-    }
-
-    @Then("a errormessage is presented {string}")
-    public void aErrormessageIsPresented(String exceptionMessage) {
-        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(exceptionMessage)));
-    }
-
-    @When("the customer use a token")
-    public void theCustomerUseAToken() {
-        this.token = this.currentCustomer.getTokens().get(0);
-        this.database.addToken(this.token);
-
-        try {
-            this.tokenService.useToken(this.currentCustomer, this.currentMerchant, this.token);
-        } catch (TokenValidationException e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-
-        assertThat(this.token.isValid(), is(equalTo(false)));
-    }
-
-    @Then("the customer gets the token removes")
-    public void theCustomerGetsTheTokenRemoves() {
-        boolean hasTokenBeenRemoved = true;
-
-        for (Token t : this.currentCustomer.getTokens()) {
-            if (t.getValue().equals(this.token.getValue())) {
-                hasTokenBeenRemoved = false;
-                break;
-            }
-        }
-
-        assertThat(hasTokenBeenRemoved, is(equalTo(true)));
-    }
-
-    @Then("a transaction is added to the merchant")
-    public void aTransactionIsAddedToTheMerchant() {
-        assertThat(this.currentMerchant.getAccount().getTransactions().size(), is(equalTo(1)));
-    }
-
-    @Then("a transaction is added to the customer")
-    public void aTransactionIsAddedToTheCustomer() {
-        assertThat(this.currentCustomer.getAccount().getTransactions().size(), is(equalTo(1)));
+    @Then("the money is transferred from the customer to merchant")
+    public void theMoneyIsTransferredFromTheCustomerToMerchant() {
+        assertThat(this.currentCustomer.getAccount().getBalance(), is(equalTo(this.customerPreviousBalance - this.paymentPrice)));
+        assertThat(this.currentMerchant.getAccount().getBalance(), is(equalTo(this.merchantPreviousBalance + this.paymentPrice)));
     }
 
 }

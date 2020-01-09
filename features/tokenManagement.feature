@@ -13,29 +13,10 @@ Feature: Token Management Features
     When the customer request more tokens
     Then the customer gets a error message saying "You have too many tokens to get new ones."
 
-  Scenario: Validate a valid token
-    Given A valid token
-    When the validation is processing
-    Then the result is "true"
+  Scenario: Customer makes a payment
+    Given the customer is registered with a account balance 1000
+    And the customer have at least 1 unused token
+    And A merchant that is registered with a account balance 1000
+    When the customer pays the merchant 100 kr
+    Then the money is transferred from the customer to merchant
 
-  Scenario: Validate a invalid token
-    Given A invalid token
-    When the validation is processing
-    Then a errormessage is presented "The token is not valid."
-
-  Scenario: Validate a fake token
-    Given A fake token
-    When the validation is processing
-    Then a errormessage is presented "The token is not valid."
-
-  Scenario: Customer use a token
-    Given the customer is registered
-    And the customer have 4 unused token left
-    And A merchant that is registered
-    When the customer use a token
-    Then the customer gets the token removes
-    And a transaction is added to the merchant
-    And a transaction is added to the customer
-
-  Scenario:
-    

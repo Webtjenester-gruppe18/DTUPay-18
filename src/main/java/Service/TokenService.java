@@ -38,41 +38,30 @@ public class TokenService {
         return generatedTokens;
     }
 
-    public boolean validateToken(Token token) throws TokenValidationException {
-
-        if (isTokenFake(token) || !token.isValid()) {
-            throw new TokenValidationException("The token is not valid.");
-        }
-
-        return token.isValid();
-    }
-
-    public boolean isTokenFake(Token token) {
-
-        ArrayList<Token> tokens = this.database.getAllTokens();
-
-        for (Token t : tokens) {
-            if (t.getValue().equals(token.getValue())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public void useToken(Customer customer, Merchant merchant, Token token) throws TokenValidationException {
-        if (validateToken(token)) {
+    public void useToken(Customer customer, Token token) throws TokenValidationException {
+        if (ControlReg.getValidationService().validateToken(customer, token) != null) {
             token.setValid(false);
             removeTokenFromCustomer(customer, token);
-
-            Transaction transaction = new Transaction(100, customer, merchant, token);
-
-            customer.getAccount().getTransactions().add(transaction);
-            merchant.getAccount().getTransactions().add(transaction);
         }
     }
 
     private void removeTokenFromCustomer(Customer customer, Token token) {
         customer.getTokens().remove(token);
+    }
+
+    private void performTransaction(Transaction transaction) {
+        transaction.getCustomer().getAccount().setBalance(transaction.getCustomer().getAccount().getBalance() - transaction.getAmount());
+        transaction.getMerchant().getAccount().setBalance(transaction.getMerchant().getAccount().getBalance() + transaction.getAmount());
+
+        transaction.getCustomer().getAccount().getTransactions().add(transaction);
+        transaction.getMerchant().getAccount().getTransactions().add(transaction);
+    }
+
+    public void makePayment(double amount, Customer customer, Merchant merchant, Token token) throws TokenValidationException {
+
+        useToken(customer, token);
+
+        Transaction transaction = new Transaction(amount, customer, merchant, token);
+        performTransaction(transaction);
     }
 }
