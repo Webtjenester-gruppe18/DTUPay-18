@@ -36,3 +36,6 @@ Feature: Token Management Features
     Then the customer gets the token removes
     And a transaction is added to the merchant
     And a transaction is added to the customer
+
+  Scenario:
+    
