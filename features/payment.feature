@@ -17,4 +17,4 @@
 #    And the token is not registered to a customer
 #    When a merchant scans the token
 #    Then the token is rejected with error message "The token is not valid."
-Feature:
+Feature: Make payment
