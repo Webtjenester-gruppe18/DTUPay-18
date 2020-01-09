@@ -3,6 +3,7 @@ package Service;
 import Control.ControlReg;
 import Database.IDatabase;
 import Exception.TokenValidationException;
+import Model.Customer;
 import Model.Token;
 import Exception.TooManyTokensException;
 import java.util.ArrayList;
@@ -54,5 +55,16 @@ public class TokenService {
         }
 
         return true;
+    }
+
+    public void useToken(Customer customer, Token token) throws TokenValidationException {
+        if (validateToken(token)) {
+            token.setValid(false);
+            removeTokenFromCustomer(customer, token);
+        }
+    }
+
+    private void removeTokenFromCustomer(Customer customer, Token token) {
+        customer.getTokens().remove(token);
     }
 }

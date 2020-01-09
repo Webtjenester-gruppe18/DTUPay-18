@@ -4,8 +4,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import Control.ControlReg;
-import Exception.TooManyTokensException;
-import Exception.ExceptionContainer;
+import Exception.*;
 import Database.IDatabase;
 import Exception.TokenValidationException;
 import Model.Customer;
@@ -126,6 +125,34 @@ public class TestTokenManagement {
     @Then("a errormessage is presented {string}")
     public void aErrormessageIsPresented(String exceptionMessage) {
         assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(exceptionMessage)));
+    }
+
+    @When("the customer use a token")
+    public void theCustomerUseAToken() {
+        this.token = this.currentCustomer.getTokens().get(0);
+        this.database.addToken(this.token);
+
+        try {
+            this.tokenService.useToken(this.currentCustomer, this.token);
+        } catch (TokenValidationException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+
+        assertThat(this.token.isValid(), is(equalTo(false)));
+    }
+
+    @Then("the customer gets the token removes")
+    public void theCustomerGetsTheTokenRemoves() {
+        boolean hasTokenBeenRemoved = true;
+
+        for (Token t : this.currentCustomer.getTokens()) {
+            if (t.getValue().equals(this.token.getValue())) {
+                hasTokenBeenRemoved = false;
+                break;
+            }
+        }
+
+        assertThat(hasTokenBeenRemoved, is(equalTo(true)));
     }
 
 }

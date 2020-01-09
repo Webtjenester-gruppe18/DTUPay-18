@@ -27,3 +27,9 @@ Feature: Token Management Features
     Given A fake token
     When the validation is processing
     Then a errormessage is presented "The token is not valid."
+
+  Scenario: Customer use a token
+    Given the customer is registered
+    And the customer have 4 unused token left
+    When the customer use a token
+    Then the customer gets the token removes
