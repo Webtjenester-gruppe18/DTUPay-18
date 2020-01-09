@@ -19,7 +19,7 @@ import io.cucumber.java.en.When;
 
 import java.util.ArrayList;
 
-public class TestTokenManagement {
+public class TokenManagementSteps {
 
     private IDatabase database;
     private TokenService tokenService;

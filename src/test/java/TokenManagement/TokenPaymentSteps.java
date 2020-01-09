@@ -1,4 +1,4 @@
-package ValidationSteps;
+package TokenManagement;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -21,7 +21,7 @@ import io.cucumber.java.en.When;
 
 import java.util.ArrayList;
 
-public class TokenValidationSteps {
+public class TokenPaymentSteps {
 
     private IDatabase database;
     private TokenService tokenService;
