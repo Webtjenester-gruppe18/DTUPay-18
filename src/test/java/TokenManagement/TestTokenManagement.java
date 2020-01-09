@@ -8,6 +8,7 @@ import Exception.*;
 import Database.IDatabase;
 import Exception.TokenValidationException;
 import Model.Customer;
+import Model.Merchant;
 import Model.Token;
 import Service.TokenService;
 import io.cucumber.java.Before;
@@ -22,6 +23,7 @@ public class TestTokenManagement {
     private IDatabase database;
     private TokenService tokenService;
     private Customer currentCustomer;
+    private Merchant currentMerchant;
     private ArrayList<Token> requestedTokens;
     private ExceptionContainer exceptionContainer;
     private Token token;
@@ -41,6 +43,14 @@ public class TestTokenManagement {
         this.database.addCustomer(currentCustomer);
 
         assertThat(this.database.getCustomer(currentCustomer.getId()), is(equalTo(currentCustomer)));
+    }
+
+    @Given("A merchant that is registered")
+    public void aMerchantThatIsRegistered() {
+        this.currentMerchant = new Merchant("Jane Doe");
+        this.database.addMerchant(this.currentMerchant);
+
+        assertThat(this.database.getMerchant(this.currentMerchant.getId()), is(equalTo(this.currentMerchant)));
     }
 
     @Given("the customer have {int} unused token left")
@@ -133,7 +143,7 @@ public class TestTokenManagement {
         this.database.addToken(this.token);
 
         try {
-            this.tokenService.useToken(this.currentCustomer, this.token);
+            this.tokenService.useToken(this.currentCustomer, this.currentMerchant, this.token);
         } catch (TokenValidationException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -153,6 +163,16 @@ public class TestTokenManagement {
         }
 
         assertThat(hasTokenBeenRemoved, is(equalTo(true)));
+    }
+
+    @Then("a transaction is added to the merchant")
+    public void aTransactionIsAddedToTheMerchant() {
+        assertThat(this.currentMerchant.getAccount().getTransactions().size(), is(equalTo(1)));
+    }
+
+    @Then("a transaction is added to the customer")
+    public void aTransactionIsAddedToTheCustomer() {
+        assertThat(this.currentCustomer.getAccount().getTransactions().size(), is(equalTo(1)));
     }
 
 }

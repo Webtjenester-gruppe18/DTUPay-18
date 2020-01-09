@@ -4,8 +4,11 @@ import Control.ControlReg;
 import Database.IDatabase;
 import Exception.TokenValidationException;
 import Model.Customer;
+import Model.Merchant;
 import Model.Token;
 import Exception.TooManyTokensException;
+import Model.Transaction;
+
 import java.util.ArrayList;
 
 public class TokenService {
@@ -57,10 +60,15 @@ public class TokenService {
         return true;
     }
 
-    public void useToken(Customer customer, Token token) throws TokenValidationException {
+    public void useToken(Customer customer, Merchant merchant, Token token) throws TokenValidationException {
         if (validateToken(token)) {
             token.setValid(false);
             removeTokenFromCustomer(customer, token);
+
+            Transaction transaction = new Transaction(100, customer, merchant, token);
+
+            customer.getAccount().getTransactions().add(transaction);
+            merchant.getAccount().getTransactions().add(transaction);
         }
     }
 

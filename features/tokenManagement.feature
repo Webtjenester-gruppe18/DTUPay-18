@@ -31,5 +31,8 @@ Feature: Token Management Features
   Scenario: Customer use a token
     Given the customer is registered
     And the customer have 4 unused token left
+    And A merchant that is registered
     When the customer use a token
     Then the customer gets the token removes
+    And a transaction is added to the merchant
+    And a transaction is added to the customer
