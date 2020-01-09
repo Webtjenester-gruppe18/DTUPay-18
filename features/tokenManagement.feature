@@ -12,3 +12,13 @@ Feature: Token Management Features
     And the customer have 4 unused token left
     When the customer request more tokens
     Then the customer gets a error message saying "You have too many tokens to get new ones."
+
+  Scenario: Validate a valid token
+    Given A valid token
+    When the validation is processing
+    Then the result is "true"
+
+  Scenario: Validate a invalid token
+    Given A invalid token
+    When the validation is processing
+    Then the result is "false"

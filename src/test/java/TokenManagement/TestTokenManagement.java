@@ -24,6 +24,8 @@ public class TestTokenManagement {
     private Customer currentCustomer;
     private ArrayList<Token> requestedTokens;
     private ExceptionContainer exceptionContainer;
+    private Token token;
+    private boolean validationResult;
 
     @Before
     public void setUp() {
@@ -75,6 +77,33 @@ public class TestTokenManagement {
     @Then("the customer gets a error message saying {string}")
     public void theCustomerGetsAErrorMessageSaying(String errorMessage) {
         assertThat(this.exceptionContainer.getErrorMessage(), is(equalTo(errorMessage)));
+    }
+
+    @Given("A valid token")
+    public void aValidToken() {
+        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
+        this.token = generatedTokens.get(0);
+
+        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
+    }
+
+    @Given("A invalid token")
+    public void aInvalidToken() {
+        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
+        this.token = generatedTokens.get(0);
+        this.token.setValid(false);
+
+        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
+    }
+
+    @When("the validation is processing")
+    public void theValidationIsProcessing() {
+        this.validationResult = this.tokenService.validateToken(this.token);
+    }
+
+    @Then("the result is {string}")
+    public void theResultIs(String res) {
+        assertThat(this.validationResult, is(equalTo(Boolean.valueOf(res))));
     }
 
 }

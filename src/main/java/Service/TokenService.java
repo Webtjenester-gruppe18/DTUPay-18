@@ -29,4 +29,8 @@ public class TokenService {
 
         return generatedTokens;
     }
+
+    public boolean validateToken(Token token) {
+        return token.isValid();
+    }
 }

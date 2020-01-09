@@ -2,6 +2,7 @@ package Database;
 
 import Model.Customer;
 import Model.Merchant;
+import Model.Token;
 
 import java.util.ArrayList;
 
@@ -9,6 +10,7 @@ public class InMemoryDatabase implements IDatabase {
 
     private ArrayList<Customer> customers;
     private ArrayList<Merchant> merchants;
+    private ArrayList<Token> tokens;
 
     public InMemoryDatabase() {
         this.customers = new ArrayList<>();
