@@ -1,5 +1,4 @@
 package Control;
-
 import Bank.Bank;
 import Bank.IBank;
 import Database.IDatabase;
@@ -40,3 +39,4 @@ public class ControlReg {
         return validationService;
     }
 }
+
