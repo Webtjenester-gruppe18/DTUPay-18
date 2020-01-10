@@ -86,48 +86,4 @@ public class TokenManagementSteps {
         assertThat(this.exceptionContainer.getErrorMessage(), is(equalTo(errorMessage)));
     }
 
-
-    @Given("the customer is registered with a account balance {int}")
-    public void theCustomerIsRegisteredWithAAccountBalance(Integer balance) {
-        this.currentCustomer = new Customer("John Doe");
-        this.customerPreviousBalance = balance;
-        this.currentCustomer.getAccount().setBalance(balance);
-        this.database.addCustomer(this.currentCustomer);
-
-        assertThat(this.database.getCustomer(this.currentCustomer.getId()), is(equalTo(this.currentCustomer)));
-    }
-
-    @Given("A merchant that is registered with a account balance {int}")
-    public void aMerchantThatIsRegisteredWithAAccountBalance(Integer balance) {
-        this.currentMerchant = new Merchant("Jane Doe");
-        this.merchantPreviousBalance = balance;
-        this.currentMerchant.getAccount().setBalance(balance);
-        this.database.addMerchant(this.currentMerchant);
-
-        assertThat(this.database.getMerchant(this.currentMerchant.getId()), is(equalTo(this.currentMerchant)));
-    }
-
-    @Given("the customer have at least {int} unused token")
-    public void theCustomerHaveAtLeastUnusedToken(Integer amountOfTokens) {
-        ArrayList<Token> tokens = this.tokenService.generateTokens(amountOfTokens);
-        this.currentCustomer.getTokens().addAll(tokens);
-    }
-
-    @When("the customer pays the merchant {int} kr")
-    public void theCustomerPaysTheMerchantKr(Integer amount) {
-        try {
-             this.paymentToken = this.currentCustomer.getTokens().get(0);
-             this.paymentPrice = amount;
-             this.tokenService.makePayment(amount, this.currentCustomer, this.currentMerchant, this.currentCustomer.getTokens().get(0));
-        } catch (TokenValidationException e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-    }
-
-    @Then("the money is transferred from the customer to merchant")
-    public void theMoneyIsTransferredFromTheCustomerToMerchant() {
-        assertThat(this.currentCustomer.getAccount().getBalance(), is(equalTo(this.customerPreviousBalance - this.paymentPrice)));
-        assertThat(this.currentMerchant.getAccount().getBalance(), is(equalTo(this.merchantPreviousBalance + this.paymentPrice)));
-    }
-
 }

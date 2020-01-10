@@ -13,10 +13,3 @@ Feature: Token Management Features
     When the customer request more tokens
     Then the customer gets a error message saying "You have too many tokens to get new ones."
 
-  Scenario: Customer makes a payment
-    Given the customer is registered with a account balance 1000
-    And the customer have at least 1 unused token
-    And A merchant that is registered with a account balance 1000
-    When the customer pays the merchant 100 kr
-    Then the money is transferred from the customer to merchant
-
