@@ -4,13 +4,14 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import Control.ControlReg;
-import Exception.TooManyTokensException;
-import Exception.ExceptionContainer;
+import Exception.*;
 import Database.IDatabase;
-import Database.InMemoryDatabase;
+import Exception.TokenValidationException;
 import Model.Customer;
+import Model.Merchant;
 import Model.Token;
 import Service.TokenService;
+import Service.ValidationService;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -18,20 +19,25 @@ import io.cucumber.java.en.When;
 
 import java.util.ArrayList;
 
-public class TestTokenManagement {
+public class TokenManagementSteps {
 
     private IDatabase database;
     private TokenService tokenService;
     private Customer currentCustomer;
+    private Merchant currentMerchant;
     private ArrayList<Token> requestedTokens;
     private ExceptionContainer exceptionContainer;
-    private Token token;
-    private boolean validationResult;
+    private Token paymentToken;
+    private ValidationService validationService;
+    private double paymentPrice;
+    private double customerPreviousBalance;
+    private double merchantPreviousBalance;
 
     @Before
     public void setUp() {
         this.database = ControlReg.getDatabase();
-        this.tokenService = new TokenService();
+        this.tokenService = ControlReg.getTokenService();
+        this.validationService = ControlReg.getValidationService();
         this.requestedTokens = new ArrayList<>();
         this.exceptionContainer = new ExceptionContainer();
     }
@@ -78,43 +84,6 @@ public class TestTokenManagement {
     @Then("the customer gets a error message saying {string}")
     public void theCustomerGetsAErrorMessageSaying(String errorMessage) {
         assertThat(this.exceptionContainer.getErrorMessage(), is(equalTo(errorMessage)));
-    }
-
-    @Given("A valid token")
-    public void aValidToken() {
-        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
-        this.token = generatedTokens.get(0);
-        this.database.addToken(this.token);
-
-        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
-    }
-
-    @Given("A invalid token")
-    public void aInvalidToken() {
-        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
-        this.token = generatedTokens.get(0);
-        this.token.setValid(false);
-        this.database.addToken(this.token);
-
-        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
-    }
-
-    @Given("A fake token")
-    public void aFakeToken() {
-        ArrayList<Token> generatedTokens = this.tokenService.generateTokens(1);
-        this.token = generatedTokens.get(0);
-
-        assertThat(this.token, is(equalTo(generatedTokens.get(0))));
-    }
-
-    @When("the validation is processing")
-    public void theValidationIsProcessing() {
-        this.validationResult = this.tokenService.validateToken(this.token);
-    }
-
-    @Then("the result is {string}")
-    public void theResultIs(String res) {
-        assertThat(this.validationResult, is(equalTo(Boolean.valueOf(res))));
     }
 
 }

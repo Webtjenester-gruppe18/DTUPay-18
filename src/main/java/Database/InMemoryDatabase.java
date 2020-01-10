@@ -24,6 +24,11 @@ public class InMemoryDatabase implements IDatabase {
     }
 
     @Override
+    public void addMerchant(Merchant merchant) {
+        this.merchants.add(merchant);
+    }
+
+    @Override
     public void addToken(Token token) {
         this.tokens.add(token);
     }
@@ -38,6 +43,16 @@ public class InMemoryDatabase implements IDatabase {
         for (Customer customer : this.customers) {
             if (customer.getId().equals(id)) {
                 return customer;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Merchant getMerchant(String id) {
+        for (Merchant merchant : this.merchants) {
+            if (merchant.getId().equals(id)) {
+                return merchant;
             }
         }
         return null;

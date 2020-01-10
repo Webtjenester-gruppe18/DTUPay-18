@@ -8,7 +8,7 @@ public class Account {
     private ArrayList<Transaction> transactions;
 
     public Account() {
-        this.balance = 0;
+        this.balance = 1000;
         this.transactions = new ArrayList<>();
     }
 

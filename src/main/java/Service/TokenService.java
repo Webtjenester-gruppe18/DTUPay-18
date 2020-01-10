@@ -2,9 +2,13 @@ package Service;
 
 import Control.ControlReg;
 import Database.IDatabase;
-import Database.InMemoryDatabase;
+import Exception.TokenValidationException;
+import Model.Customer;
+import Model.Merchant;
 import Model.Token;
 import Exception.TooManyTokensException;
+import Model.Transaction;
+
 import java.util.ArrayList;
 
 public class TokenService {
@@ -34,25 +38,30 @@ public class TokenService {
         return generatedTokens;
     }
 
-    public boolean validateToken(Token token) {
-
-        if (isTokenFake(token)) {
-            return false;
+    public void useToken(Customer customer, Token token) throws TokenValidationException {
+        if (ControlReg.getValidationService().validateToken(customer, token) != null) {
+            token.setValid(false);
+            removeTokenFromCustomer(customer, token);
         }
-
-        return token.isValid();
     }
 
-    public boolean isTokenFake(Token token) {
+    private void removeTokenFromCustomer(Customer customer, Token token) {
+        customer.getTokens().remove(token);
+    }
 
-        ArrayList<Token> tokens = this.database.getAllTokens();
+    private void performTransaction(Transaction transaction) {
+        transaction.getCustomer().getAccount().setBalance(transaction.getCustomer().getAccount().getBalance() - transaction.getAmount());
+        transaction.getMerchant().getAccount().setBalance(transaction.getMerchant().getAccount().getBalance() + transaction.getAmount());
 
-        for (Token t : tokens) {
-            if (t.getValue().equals(token.getValue())) {
-                return false;
-            }
-        }
+        transaction.getCustomer().getAccount().getTransactions().add(transaction);
+        transaction.getMerchant().getAccount().getTransactions().add(transaction);
+    }
 
-        return true;
+    public void makePayment(double amount, Customer customer, Merchant merchant, Token token) throws TokenValidationException {
+
+        useToken(customer, token);
+
+        Transaction transaction = new Transaction(amount, customer, merchant, token);
+        performTransaction(transaction);
     }
 }
