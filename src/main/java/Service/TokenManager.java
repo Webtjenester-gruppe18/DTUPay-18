@@ -2,7 +2,6 @@ package Service;
 
 import Control.ControlReg;
 import Database.ITokenDatabase;
-import Model.Customer;
 import Model.Token;
 import dtu.ws.fastmoney.User;
 import Exception.*;
