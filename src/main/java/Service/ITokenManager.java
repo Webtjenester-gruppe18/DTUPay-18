@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public interface ITokenManager {
 
     ArrayList<Token> getTokensByCpr(String cpr);
+    ArrayList<Token> getUnusedTokensByCpr(String cpr);
     Token generateToken(User customer);
     ArrayList<Token> generateTokens(User customer, int amount) throws TooManyTokensException;
     ArrayList<Token> requestForNewTokens(User customer) throws TooManyTokensException;

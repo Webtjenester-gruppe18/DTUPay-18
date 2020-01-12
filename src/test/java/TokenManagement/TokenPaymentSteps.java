@@ -12,11 +12,11 @@ import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import dtu.ws.fastmoney.User;
 import io.cucumber.core.api.Scenario;
+import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.After;
 import java.math.BigDecimal;
 
 public class TokenPaymentSteps {
@@ -105,12 +105,13 @@ public class TokenPaymentSteps {
     @When("the customer pays the merchant {int} kr")
     public void theCustomerPaysTheMerchantKr(Integer price) {
         try {
+            this.currentToken = this.tokenManager.getUnusedTokensByCpr(this.currentCustomer.getCprNumber()).get(0);
             this.bank.transferMoneyFromTo(
                     this.customerAccountNumber,
                     this.merchantAccountNumber,
                     BigDecimal.valueOf(price),
                     "Testing scenario.",
-                    this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).get(0));
+                    this.currentToken);
         } catch (TokenValidationException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         } catch (BankServiceException_Exception e) {
@@ -176,6 +177,27 @@ public class TokenPaymentSteps {
         assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(errorMessage)));
     }
 
+    //
+    //  Customer tries to pay with a used token
+    //
+
+    @When("the customer pays again {int} kr with the same token")
+    public void theCustomerPaysAgainKrWithTheSameToken(Integer price) {
+        try {
+            this.bank.transferMoneyFromTo(
+                    this.customerAccountNumber,
+                    this.merchantAccountNumber,
+                    BigDecimal.valueOf(price),
+                    "Testing scenario.",
+                    this.currentToken);
+        } catch (TokenValidationException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+    }
+
+
     @After
     public void tearDown(Scenario scenario) throws BankServiceException_Exception {
 
@@ -183,13 +205,5 @@ public class TokenPaymentSteps {
         System.out.println(scenario.getName() + " Status - " + scenario.getStatus());
         System.out.println("------------------------------");
 
-        System.out.println("Running after section....");
-
-        // clear user account
-        Account account = this.bank.getAccountByCpr(this.currentCustomer.getCprNumber());
-        this.bank.retireAccount(account.getId());
-
-        // clear user tokens
-        this.tokenManager.clearUserTokens(this.currentCustomer.getCprNumber());
     }
 }

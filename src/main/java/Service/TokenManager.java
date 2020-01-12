@@ -20,6 +20,19 @@ public class TokenManager implements ITokenManager {
     }
 
     @Override
+    public ArrayList<Token> getUnusedTokensByCpr(String cpr) {
+        ArrayList<Token> result = new ArrayList<>();
+
+        for (Token token : this.getTokensByCpr(cpr)) {
+            if (!token.isHasBeenUsed()) {
+                result.add(token);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public Token generateToken(User customer) {
 
         Token token = new Token(customer.getCprNumber());
