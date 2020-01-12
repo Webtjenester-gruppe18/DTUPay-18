@@ -73,8 +73,7 @@ public class TokenPaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-//        System.out.println("TESTING AMOUNT OF TOKEN...");
-//        assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), is(equalTo(amountOfTokens)));
+        assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), is(equalTo(amountOfTokens)));
     }
 
     @Given("a merchant that is registered with an account balance {int}")
@@ -205,5 +204,16 @@ public class TokenPaymentSteps {
         System.out.println(scenario.getName() + " Status - " + scenario.getStatus());
         System.out.println("------------------------------");
 
+        if (this.customerAccountNumber != null) {
+            this.bank.retireAccount(this.customerAccountNumber);
+        }
+
+        if (this.merchantAccountNumber != null) {
+            this.bank.retireAccount(this.merchantAccountNumber);
+        }
+
+        if (this.currentCustomer != null) {
+            this.tokenManager.clearUserTokens(this.currentCustomer.getCprNumber());
+        }
     }
 }
