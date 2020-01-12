@@ -2,14 +2,18 @@ package Service;
 
 import Control.ControlReg;
 import Database.ITokenDatabase;
+import Model.Customer;
 import Model.Token;
 import dtu.ws.fastmoney.User;
+import Exception.*;
 
 import java.util.ArrayList;
 
 public class TokenManager implements ITokenManager {
 
     private ITokenDatabase tokenDatabase = ControlReg.getTokenDatabase();
+    private final int maxAmountOfTokens = 6;
+    private final int amountOfTokensToRequestForNewOnes = 1;
 
     @Override
     public ArrayList<Token> getTokensByCpr(String cpr) {
@@ -27,8 +31,12 @@ public class TokenManager implements ITokenManager {
     }
 
     @Override
-    public ArrayList<Token> generateTokens(User customer, int amount) {
+    public ArrayList<Token> generateTokens(User customer, int amount) throws TooManyTokensException {
         ArrayList<Token> result = new ArrayList<>();
+
+        if (getTokensByCpr(customer.getCprNumber()).size() > 1) {
+            throw new TooManyTokensException("The user has too many token to request for new ones.");
+        }
 
         for (int i = 0; i < amount; i++) {
             result.add(generateToken(customer));
@@ -38,9 +46,43 @@ public class TokenManager implements ITokenManager {
     }
 
     @Override
+    public ArrayList<Token> requestForNewTokens(User customer) throws TooManyTokensException {
+
+        ArrayList<Token> userTokens = getTokensByCpr(customer.getCprNumber());
+
+        if (userTokens.size() > amountOfTokensToRequestForNewOnes) {
+            throw new TooManyTokensException("The user has too many token to request for new ones.");
+        }
+
+        return generateTokens(customer, maxAmountOfTokens - userTokens.size());
+    }
+
+    @Override
     public void clearUserTokens(String cpr) {
         for (Token token : this.tokenDatabase.getTokensByCpr(cpr)) {
             this.tokenDatabase.getAllTokens().remove(token);
         }
+    }
+
+    @Override
+    public Token validateToken(User customer, Token token) throws TokenValidationException {
+        if (isTokenFake(customer, token) || !token.isHasBeenUsed()) {
+            throw new TokenValidationException("The token is not valid.");
+        }
+
+        return token;
+    }
+
+    public boolean isTokenFake(User customer, Token token) {
+
+        ArrayList<Token> tokens = this.getTokensByCpr(customer.getCprNumber());
+
+        for (Token t : tokens) {
+            if (t.getValue().equals(token.getValue())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

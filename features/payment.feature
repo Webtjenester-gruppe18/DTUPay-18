@@ -6,7 +6,7 @@ Feature: Make payment
     And A merchant that is registered with an account balance 1000
     When the customer pays the merchant 100 kr
     Then the customer account balance is 900 kr
-    Then the merchant account balance is 1100 kr
+    And the merchant account balance is 1100 kr
 
 #  Scenario: Customer tries to pay with a used token
 #    Given the customer is registered with a account balance 1000
@@ -17,7 +17,8 @@ Feature: Make payment
 #    When the customer pays again 100kr with the same token
 #    Then the payment is rejected with the error message "The token is not valid."
 #
-#  Scenario: Customer tries to pay with a fake token
-#    Given an token unknown to DTU Pay
-#    When the merchant uses this token for payment
-#    Then the payment is rejected with the error message "The token is not valid."
+  Scenario: Customer tries to pay with a fake token
+    Given a customer that is registered
+    And an token unknown to DTU Pay
+    When the merchant uses this token for payment
+    Then the payment is rejected with the error message "The token is not valid."

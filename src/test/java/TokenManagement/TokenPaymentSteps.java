@@ -33,6 +33,7 @@ public class TokenPaymentSteps {
     private String merchantAccountNumber;
     private User currentCustomer;
     private User currentMerchant;
+    private Token currentToken;
 
     @Before
     public void setUp() {
@@ -68,7 +69,11 @@ public class TokenPaymentSteps {
 
     @Given("the customer has at least {int} unused token")
     public void theCustomerHasAtLeastUnusedToken(Integer amountOfTokens) {
-        this.tokenManager.generateTokens(this.currentCustomer, amountOfTokens);
+        try {
+            this.tokenManager.generateTokens(this.currentCustomer, amountOfTokens);
+        } catch (TooManyTokensException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
 
         assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), is(equalTo(amountOfTokens)));
     }
@@ -140,5 +145,39 @@ public class TokenPaymentSteps {
 
         // clear user tokens
         this.tokenManager.clearUserTokens(this.currentCustomer.getCprNumber());
+    }
+
+
+    //
+    //  Customer tries to pay with a fake token
+    //
+
+    @Given("a customer that is registered")
+    public void aCustomerThatIsRegistered() {
+        User customer = new User();
+        customer.setCprNumber("991199-2200");
+        customer.setFirstName("Jane");
+        customer.setLastName("Doe");
+
+        this.currentCustomer = customer;
+    }
+
+    @Given("an token unknown to DTU Pay")
+    public void anTokenUnknownToDTUPay() {
+        this.currentToken = new Token("000000-0000");
+    }
+
+    @When("the merchant uses this token for payment")
+    public void theMerchantUsesThisTokenForPayment() {
+        try {
+            this.tokenManager.validateToken(this.currentCustomer, this.currentToken);
+        } catch (TokenValidationException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+    }
+
+    @Then("the payment is rejected with the error message {string}")
+    public void thePaymentIsRejectedWithTheErrorMessage(String errorMessage) {
+        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(errorMessage)));
     }
 }
