@@ -10,7 +10,7 @@ public class ValidationService {
 
     public Token validateToken(Customer customer, Token token) throws TokenValidationException {
 
-        if (isTokenFake(customer, token) || !token.isValid()) {
+        if (isTokenFake(customer, token) || !token.isHasBeenUsed()) {
             throw new TokenValidationException("The token is not valid.");
         }
 

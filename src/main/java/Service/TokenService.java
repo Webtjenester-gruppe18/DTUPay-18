@@ -40,7 +40,7 @@ public class TokenService {
 
     public void useToken(Customer customer, Token token) throws TokenValidationException {
         if (ControlReg.getValidationService().validateToken(customer, token) != null) {
-            token.setValid(false);
+            token.setHasBeenUsed(false);
             removeTokenFromCustomer(customer, token);
         }
     }

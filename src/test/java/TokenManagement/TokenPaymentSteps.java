@@ -2,130 +2,143 @@ package TokenManagement;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import Bank.IBank;
 import Control.ControlReg;
-import Database.InMemoryDatabase;
 import Exception.*;
 import Database.IDatabase;
 import Exception.TokenValidationException;
 import Model.Customer;
 import Model.Merchant;
 import Model.Token;
+import Service.ITokenManager;
 import Service.TokenService;
 import Service.ValidationService;
-import cucumber.api.PendingException;
+import dtu.ws.fastmoney.Account;
+import dtu.ws.fastmoney.BankServiceException_Exception;
+import dtu.ws.fastmoney.User;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.After;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class TokenPaymentSteps {
 
-    private IDatabase database;
-    private TokenService tokenService;
-    private Customer currentCustomer;
-    private Merchant currentMerchant;
-    private ArrayList<Token> requestedTokens;
-    private ExceptionContainer exceptionContainer;
-    private Token paymentToken;
-    private ValidationService validationService;
-    private double paymentPrice;
-    private double customerPreviousBalance;
-    private double merchantPreviousBalance;
+    private IBank bank;
+    private ITokenManager tokenManager;
+    private String customerAccountNumber;
+    private String merchantAccountNumber;
+    private User currentCustomer;
+    private User currentMerchant;
+
     @Before
     public void setUp() {
-        this.database = ControlReg.getDatabase();
-        this.tokenService = ControlReg.getTokenService();
-        this.validationService = ControlReg.getValidationService();
-        this.requestedTokens = new ArrayList<>();
-        this.exceptionContainer = new ExceptionContainer();
+
+        this.bank = ControlReg.getBank();
+        this.tokenManager = ControlReg.getTokenManager();
     }
 
     @Given("the customer is registered with a account balance {int}")
     public void theCustomerIsRegisteredWithAAccountBalance(Integer balance) {
-        this.currentCustomer = new Customer("John Doe");
-        this.customerPreviousBalance = balance;
-        this.currentCustomer.getAccount().setBalance(balance);
-        this.database.addCustomer(this.currentCustomer);
+        User customer = new User();
+        customer.setCprNumber("991199-2200");
+        customer.setFirstName("Jane");
+        customer.setLastName("Doe");
 
-        assertThat(this.database.getCustomer(this.currentCustomer.getId()), is(equalTo(this.currentCustomer)));
+        this.currentCustomer = customer;
+
+        try {
+            this.customerAccountNumber = this.bank.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(balance));
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+
+        Account customerAccount = null;
+        try {
+            customerAccount = this.bank.getAccount(this.customerAccountNumber);
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+
+        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
     }
 
-    @Given("A merchant that is registered with a account balance {int}")
-    public void aMerchantThatIsRegisteredWithAAccountBalance(Integer balance) {
-        this.currentMerchant = new Merchant("Jane Doe");
-        this.merchantPreviousBalance = balance;
-        this.currentMerchant.getAccount().setBalance(balance);
-        this.database.addMerchant(this.currentMerchant);
+    @Given("the customer has at least {int} unused token")
+    public void theCustomerHasAtLeastUnusedToken(Integer amountOfTokens) {
+        this.tokenManager.generateTokens(this.currentCustomer, amountOfTokens);
 
-        assertThat(this.database.getMerchant(this.currentMerchant.getId()), is(equalTo(this.currentMerchant)));
+        assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), is(equalTo(amountOfTokens)));
     }
 
-    @Given("the customer have at least {int} unused token")
-    public void theCustomerHaveAtLeastUnusedToken(Integer amountOfTokens) {
-        ArrayList<Token> tokens = this.tokenService.generateTokens(amountOfTokens);
-        this.currentCustomer.getTokens().addAll(tokens);
+    @Given("A merchant that is registered with an account balance {int}")
+    public void aMerchantThatIsRegisteredWithAnAccountBalance(Integer balance) {
+        User merchant = new User();
+        merchant.setCprNumber("112233-4455");
+        merchant.setFirstName("John");
+        merchant.setLastName("Doe");
+
+        this.currentMerchant = merchant;
+
+        try {
+            this.merchantAccountNumber = this.bank.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(balance));
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+
+        Account customerAccount = null;
+        try {
+            customerAccount = this.bank.getAccount(this.merchantAccountNumber);
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+
+        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
     }
 
     @When("the customer pays the merchant {int} kr")
-    public void theCustomerPaysTheMerchantKr(Integer amount) {
+    public void theCustomerPaysTheMerchantKr(Integer price) {
         try {
-            this.paymentToken = this.currentCustomer.getTokens().get(0);
-            this.paymentPrice = amount;
-            this.tokenService.makePayment(amount, this.currentCustomer, this.currentMerchant, this.currentCustomer.getTokens().get(0));
-        } catch (TokenValidationException e) {
+            this.bank.transferMoneyFromTo(this.customerAccountNumber, this.merchantAccountNumber, BigDecimal.valueOf(price), "Testing scenario.");
+        } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
 
-    @Then("the money is transferred from the customer to merchant")
-    public void theMoneyIsTransferredFromTheCustomerToMerchant() {
-        assertThat(this.currentCustomer.getAccount().getBalance(), is(equalTo(this.customerPreviousBalance - this.paymentPrice)));
-        assertThat(this.currentMerchant.getAccount().getBalance(), is(equalTo(this.merchantPreviousBalance + this.paymentPrice)));
-    }
+    @Then("the customer account balance is {int} kr")
+    public void theCustomerAccountBalanceIsKr(Integer customerAccountBalance) {
 
-    @Given("the customer have at least {int} used token")
-    public void theCustomerHaveAtLeastUsedToken(Integer amountOfTokens) {
-        ArrayList<Token> tokens = this.tokenService.generateTokens(amountOfTokens);
-        this.currentCustomer.getTokens().addAll(tokens);
-
-        for (Token token : this.currentCustomer.getTokens()) {
-            token.setValid(false);
-        }
-    }
-
-    @When("the customer pay {int} with a used token")
-    public void theCustomerPayWithAUsedToken(Integer amount) {
+        Account customerAccount = null;
         try {
-            this.paymentToken = this.currentCustomer.getTokens().get(0);
-            this.paymentPrice = amount;
-            this.tokenService.makePayment(amount, this.currentCustomer, this.currentMerchant, this.currentCustomer.getTokens().get(0));
-        } catch (TokenValidationException e) {
+            customerAccount = this.bank.getAccount(this.customerAccountNumber);
+        } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
+
+        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(customerAccountBalance))));
     }
 
-    @Then("the payment is rejected with the error message {string}")
-    public void thePaymentIsRejectedWithTheErrorMessage(String errorMessage) {
-        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(errorMessage)));
-    }
-
-    @Given("a token not attached to the customer")
-    public void aTokenNotAttachedToTheCustomer() {
-        this.paymentToken = new Token();
-
-        assertThat(this.validationService.isTokenFake(this.currentCustomer, this.paymentToken), is(equalTo(true)));
-    }
-
-    @When("the customer pay {int} with a fake token")
-    public void theCustomerPayWithAFakeToken(Integer amount) {
+    @Then("the merchant account balance is {int} kr")
+    public void theMerchantAccountBalanceIsKr(Integer merchantAccountBalance) {
+        Account merchantAccount = null;
         try {
-            this.paymentPrice = amount;
-            this.tokenService.makePayment(amount, this.currentCustomer, this.currentMerchant, this.paymentToken);
-        } catch (TokenValidationException e) {
+            merchantAccount = this.bank.getAccount(this.merchantAccountNumber);
+        } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
+
+        assertThat(merchantAccount.getBalance(), is(equalTo(BigDecimal.valueOf(merchantAccountBalance))));
+    }
+
+    @After
+    public void tearDown() throws BankServiceException_Exception {
+        // clear user account
+        Account account = this.bank.getAccountByCpr(this.currentCustomer.getCprNumber());
+        this.bank.retireAccount(account.getId());
+
+        // clear user tokens
+        this.tokenManager.clearUserTokens(this.currentCustomer.getCprNumber());
     }
 }
