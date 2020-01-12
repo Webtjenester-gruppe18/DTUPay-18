@@ -64,17 +64,17 @@ public class TokenManager implements ITokenManager {
     }
 
     @Override
-    public Token validateToken(User customer, Token token) throws TokenValidationException {
-        if (isTokenFake(customer, token) || !token.isHasBeenUsed()) {
+    public Token validateToken(String userCpr, Token token) throws TokenValidationException {
+        if (isTokenFake(userCpr, token) || token.isHasBeenUsed()) {
             throw new TokenValidationException("The token is not valid.");
         }
 
         return token;
     }
 
-    public boolean isTokenFake(User customer, Token token) {
+    public boolean isTokenFake(String userCpr, Token token) {
 
-        ArrayList<Token> tokens = this.getTokensByCpr(customer.getCprNumber());
+        ArrayList<Token> tokens = this.getTokensByCpr(userCpr);
 
         for (Token t : tokens) {
             if (t.getValue().equals(token.getValue())) {

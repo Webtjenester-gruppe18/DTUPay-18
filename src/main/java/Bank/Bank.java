@@ -1,13 +1,17 @@
 package Bank;
 
 import Control.ControlReg;
+import Model.Token;
+import Service.ITokenManager;
 import dtu.ws.fastmoney.*;
+import Exception.*;
 
 import java.math.BigDecimal;
 
 public class Bank implements IBank {
 
     private BankService bank = ControlReg.getBankService();
+    private ITokenManager tokenManager = ControlReg.getTokenManager();
 
     @Override
     public String createAccountWithBalance(User user, BigDecimal initialBalance) throws BankServiceException_Exception {
@@ -30,7 +34,13 @@ public class Bank implements IBank {
     }
 
     @Override
-    public void transferMoneyFromTo(String toAccountNumber, String fromAccountNumber, BigDecimal amount, String description) throws BankServiceException_Exception {
-        this.bank.transferMoneyFromTo(toAccountNumber, fromAccountNumber, amount, description);
+    public void transferMoneyFromTo(String fromAccountNumber, String toAccountNumber, BigDecimal amount, String description, Token token) throws BankServiceException_Exception, TokenValidationException {
+
+        Account customerAccount = this.bank.getAccount(fromAccountNumber);
+        this.tokenManager.validateToken(customerAccount.getUser().getCprNumber(), token);
+
+        this.bank.transferMoneyFromTo(fromAccountNumber, toAccountNumber, amount, description);
+
+        token.setHasBeenUsed(true);
     }
 }

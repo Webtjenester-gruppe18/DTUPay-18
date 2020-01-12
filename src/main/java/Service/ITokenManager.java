@@ -1,6 +1,5 @@
 package Service;
 
-import Model.Customer;
 import Model.Token;
 import dtu.ws.fastmoney.User;
 import Exception.*;
@@ -14,5 +13,5 @@ public interface ITokenManager {
     ArrayList<Token> generateTokens(User customer, int amount) throws TooManyTokensException;
     ArrayList<Token> requestForNewTokens(User customer) throws TooManyTokensException;
     void clearUserTokens(String cpr);
-    Token validateToken(User customer, Token token) throws TokenValidationException;
+    Token validateToken(String userCpr, Token token) throws TokenValidationException;
 }

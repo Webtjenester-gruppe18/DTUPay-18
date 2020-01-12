@@ -10,13 +10,13 @@ public class Token {
 
     public Token() {
         this.value = UUID.randomUUID().toString();
-        this.hasBeenUsed = true;
+        this.hasBeenUsed = false;
     }
 
     public Token(String customerCpr) {
         this.customerCpr = customerCpr;
         this.value = UUID.randomUUID().toString();
-        this.hasBeenUsed = true;
+        this.hasBeenUsed = false;
     }
 
     public String getValue() {
