@@ -114,6 +114,8 @@ public class PaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        } catch (NotEnoughMoneyException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
 
@@ -191,6 +193,8 @@ public class PaymentSteps {
         } catch (TokenValidationException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        } catch (NotEnoughMoneyException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }

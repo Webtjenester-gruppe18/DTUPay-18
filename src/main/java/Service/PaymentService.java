@@ -15,17 +15,26 @@ public class PaymentService implements IPaymentService {
     private ITokenManager tokenManager = ControlReg.getTokenManager();
 
     @Override
-    public void performPayment(String fromAccountNumber, String toAccountNumber, BigDecimal amount, String description, Token token) throws BankServiceException_Exception, TokenValidationException {
+    public void performPayment(String fromAccountNumber, String toAccountNumber, BigDecimal amount, String description, Token token) throws BankServiceException_Exception, TokenValidationException, NotEnoughMoneyException {
         Account customerAccount = this.bankService.getAccount(fromAccountNumber);
         this.tokenManager.validateToken(customerAccount.getUser().getCprNumber(), token);
 
-        this.bankService.transferMoneyFromTo(fromAccountNumber, toAccountNumber, amount, description, token);
-
-        this.tokenManager.useToken(token);
+        if (isPaymentPossible(customerAccount, amount)) {
+            this.bankService.transferMoneyFromTo(fromAccountNumber, toAccountNumber, amount, description, token);
+            this.tokenManager.useToken(token);
+        }
     }
 
     @Override
     public void performRefund(Transaction transaction) {
 
+    }
+
+    private boolean isPaymentPossible(Account account, BigDecimal requestedAmount) throws NotEnoughMoneyException {
+        if (account.getBalance().compareTo(requestedAmount) != -1) {
+            return true;
+        }
+
+        throw new NotEnoughMoneyException("You have not enough money.");
     }
 }
