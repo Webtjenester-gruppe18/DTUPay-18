@@ -85,6 +85,13 @@ public class TokenManager implements ITokenManager {
         return token;
     }
 
+    @Override
+    public Token useToken(Token token) {
+        token.setHasBeenUsed(true);
+
+        return token;
+    }
+
     public boolean isTokenFake(String userCpr, Token token) {
 
         ArrayList<Token> tokens = this.getTokensByCpr(userCpr);

@@ -15,4 +15,5 @@ public interface ITokenManager {
     ArrayList<Token> requestForNewTokens(User customer) throws TooManyTokensException;
     void clearUserTokens(String cpr);
     Token validateToken(String userCpr, Token token) throws TokenValidationException;
+    Token useToken(Token token);
 }
