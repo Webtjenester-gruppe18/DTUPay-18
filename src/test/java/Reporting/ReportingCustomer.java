@@ -4,7 +4,6 @@ import Bank.IBank;
 import Control.ControlReg;
 import Model.Token;
 import Exception.*;
-import Exception.TokenValidationException;
 import Service.ITokenManager;
 import dtu.ws.fastmoney.*;
 import io.cucumber.core.api.Scenario;
@@ -17,7 +16,6 @@ import io.cucumber.java.en.When;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ReportingCustomer {
@@ -25,9 +23,11 @@ public class ReportingCustomer {
     private IBank bank;
     private ITokenManager tokenManager;
     private String customerAccountNumber;
-    private String merchantAccountNumber;
+    private String merchantAccountNumberA;
+    private String merchantAccountNumberB;
     private User currentCustomer;
-    private User currentMerchant;
+    private User currentMerchantA;
+    private User currentMerchantB;
     private List<Transaction> customerTransactions;
     private Token currentToken;
 
@@ -42,7 +42,7 @@ public class ReportingCustomer {
     }
 
     @Before
-    public void setUpAccounts() {
+    public void setUpCustomerAccounts() {
         // Create account for customer
         User customer = new User();
         customer.setCprNumber("101097-0202");
@@ -60,28 +60,40 @@ public class ReportingCustomer {
         } catch (TooManyTokensException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
-
-        // Create account for merchant
-        User merchant = new User();
-        merchant.setCprNumber("050597-04024");
-        merchant.setFirstName("Kebabistan");
-        merchant.setLastName("ApS");
-
-        this.currentMerchant = merchant;
-        this.merchantAccountNumber = "d6c8f2e1-2134-4002-b01c-0a428510882b";
     }
 
-    /*
+    @Before
+    public void setUpMerchantAccounts() {
+        // Create account for merchant
+        User merchantA = new User();
+        merchantA.setCprNumber("050597-04024");
+        merchantA.setFirstName("Kebabistan");
+        merchantA.setLastName("ApS");
+
+        User merchantB = new User();
+        merchantB.setCprNumber("020297-06026");
+        merchantB.setFirstName("Alis Bageri");
+        merchantB.setLastName("ApS");
+
+        this.currentMerchantA = merchantA;
+        this.currentMerchantB = merchantB;
+
+        this.merchantAccountNumberA = "d6c8f2e1-2134-4002-b01c-0a428510882b";
+        this.merchantAccountNumberB = "a8f8afa2-c1bf-402a-847f-93370fb11263";
+    }
+
+
     @Before
     public void setUpTransactions() {
-        // Create transactions
+        /*
+        // Create transaction for Merchant A
         Integer transactionA = 50;
 
         try {
             this.currentToken = this.tokenManager.getUnusedTokensByCpr(this.currentCustomer.getCprNumber()).get(0);
             this.bank.transferMoneyFromTo(
                     this.customerAccountNumber,
-                    this.merchantAccountNumber,
+                    this.merchantAccountNumberA,
                     BigDecimal.valueOf(transactionA),
                     "Menu 13 at Kebabistan",
                     this.currentToken);
@@ -90,8 +102,25 @@ public class ReportingCustomer {
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
+
+        // Create transaction for Merchant B
+        Integer transactionB = 20;
+
+        try {
+            this.currentToken = this.tokenManager.getUnusedTokensByCpr(this.currentCustomer.getCprNumber()).get(0);
+            this.bank.transferMoneyFromTo(
+                    this.customerAccountNumber,
+                    this.merchantAccountNumberB,
+                    BigDecimal.valueOf(transactionB),
+                    "2x Arabisk bread at Alis Bageri",
+                    this.currentToken);
+        } catch (TokenValidationException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }*/
     }
-    */
+
 
     // -- Common
 
@@ -107,13 +136,21 @@ public class ReportingCustomer {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-
-        // Create merchant account in fastmoney
+        // Create merchant A account in fastmoney
         try {
             this.merchantAccountNumber = this.bank.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(startBalance));
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }*/
+        }
+
+        // Create merchant B account in fastmoney
+        try {
+            this.merchantAccountNumberB = this.bank.createAccountWithBalance(this.currentMerchantB, BigDecimal.valueOf(startBalance));
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+        */
+
 
         /*
         Account customerAccountExpected = null;
@@ -198,7 +235,7 @@ public class ReportingCustomer {
             // this.bank.retireAccount(this.customerAccountNumber);
         }
 
-        if (this.merchantAccountNumber != null) {
+        if (this.merchantAccountNumberA != null) {
             // this.bank.retireAccount(this.merchantAccountNumber);
         }
 
