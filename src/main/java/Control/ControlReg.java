@@ -8,6 +8,7 @@ import Service.ITokenManager;
 import Service.TokenManager;
 import dtu.ws.fastmoney.BankService;
 import Bank.InMemoryBankService;
+import dtu.ws.fastmoney.BankServiceService;
 
 public class ControlReg {
     private static ExceptionContainer exceptionContainer;
@@ -37,8 +38,8 @@ public class ControlReg {
     }
 
     public static BankService getBankService() {
-        if (bankService == null) bankService = new InMemoryBankService();
-//        if (bankService == null) bankService = new BankServiceService().getBankServicePort();
+//        if (bankService == null) bankService = new InMemoryBankService();
+        if (bankService == null) bankService = new BankServiceService().getBankServicePort();
         return bankService;
     }
 }

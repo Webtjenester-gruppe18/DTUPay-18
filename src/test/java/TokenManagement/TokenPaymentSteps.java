@@ -43,7 +43,7 @@ public class TokenPaymentSteps {
     @Given("the customer is registered with an account balance {int}")
     public void theCustomerIsRegisteredWithAnAccountBalance(Integer balance) {
         User customer = new User();
-        customer.setCprNumber("991199-2200");
+        customer.setCprNumber("999999-2200");
         customer.setFirstName("Jane");
         customer.setLastName("Doe");
 

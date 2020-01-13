@@ -23,3 +23,9 @@ Feature: Make payment
     And an token unknown to DTU Pay
     When the merchant uses this token for payment
     Then the payment is rejected with the error message "The token is not valid."
+
+#  Scenario: Customer tries to pay but don't have nok
+#    Given the customer is registered with an account balance 1000
+#    And the customer has at least 1 unused token
+#    When the customer pays the merchant 1100 kr
+#    Then the payment is rejected with the error message "The token is not valid."

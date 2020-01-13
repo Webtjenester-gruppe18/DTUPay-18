@@ -41,6 +41,6 @@ public class Bank implements IBank {
 
         this.bank.transferMoneyFromTo(fromAccountNumber, toAccountNumber, amount, description);
 
-        token.setHasBeenUsed(true);
+        this.tokenManager.useToken(token);
     }
 }
