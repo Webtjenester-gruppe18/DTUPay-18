@@ -14,12 +14,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
 public class ReportingCustomer {
 
@@ -33,6 +32,8 @@ public class ReportingCustomer {
     private User currentMerchantB;
     private List<Transaction> customerTransactions;
     private Token currentToken;
+
+    Integer startBalance = 1000;
 
     @Before
     public void setUpScenario(Scenario scenario) {
@@ -54,6 +55,13 @@ public class ReportingCustomer {
 
         this.currentCustomer = customer;
         this.customerAccountNumber = "e65df606-3854-4115-82b9-9e49e3c8d460";
+
+        // Create customer account in fastmoney
+        try {
+            this.customerAccountNumber = this.bank.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(startBalance));
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
 
         // Create tokens for customer account
         Integer amountOfTokens = 6;
@@ -83,12 +91,24 @@ public class ReportingCustomer {
 
         this.merchantAccountNumberA = "d6c8f2e1-2134-4002-b01c-0a428510882b";
         this.merchantAccountNumberB = "a8f8afa2-c1bf-402a-847f-93370fb11263";
-    }
 
+        // Create merchant A account in fastmoney
+        try {
+            this.merchantAccountNumberA = this.bank.createAccountWithBalance(this.currentMerchantA, BigDecimal.valueOf(startBalance));
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+
+        // Create merchant B account in fastmoney
+        try {
+            this.merchantAccountNumberB = this.bank.createAccountWithBalance(this.currentMerchantB, BigDecimal.valueOf(startBalance));
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+    }
 
     @Before
     public void setUpTransactions() {
-        /*
         // Create transaction for Merchant A
         Integer transactionA = 50;
 
@@ -121,7 +141,7 @@ public class ReportingCustomer {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }*/
+        }
     }
 
     // -- Common
@@ -130,31 +150,6 @@ public class ReportingCustomer {
     public void theCustomerIsRegisteredWithAnAccount() {
         Integer startBalance = 1000;
 
-        /*
-        // Create customer account in fastmoney
-        try {
-            this.customerAccountNumber = this.bank.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(startBalance));
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-
-        // Create merchant A account in fastmoney
-        try {
-            this.merchantAccountNumber = this.bank.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(startBalance));
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-
-        // Create merchant B account in fastmoney
-        try {
-            this.merchantAccountNumberB = this.bank.createAccountWithBalance(this.currentMerchantB, BigDecimal.valueOf(startBalance));
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-        */
-
-
-        /*
         Account customerAccountExpected = null;
 
         try {
@@ -163,8 +158,7 @@ public class ReportingCustomer {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(customerAccountExpected.getBalance(), is(equalTo(BigDecimal.valueOf(startBalance))));
-        */
+        //assertThat(customerAccountExpected.getBalance(), is(equalTo(BigDecimal.valueOf(startBalance))));
     }
 
     @When("the customer views his transactions")
@@ -188,20 +182,9 @@ public class ReportingCustomer {
 
     @When("the customer filters his transactions by merchant")
     public void the_customer_filters_his_transactions_by_merchant() {
-        /*
-        String merchantFilter = "Kebabistan"; // accountNumber: d6c8f2e1-2134-4002-b01c-0a428510882b
+        String merchantFilter = "d6c8f2e1-2134-4002-b01c-0a428510882b"; // Kebabistan accountNumber: d6c8f2e1-2134-4002-b01c-0a428510882b
 
-        try {
-            this.bank.getAccount(this.merchantAccountNumberA).getUser().getFirstName();
-        } catch (BankServiceException_Exception e) {
-            e.printStackTrace();
-        }
-
-        assertThat(this.customerTransactions, containsInAnyOrder(""));
-        */
-
-        // Write code here that turns the phrase above into concrete actions
-        // throw new cucumber.api.PendingException();
+        //assertThat(this.customerTransactions, containsInAnyOrder(merchantFilter));
     }
 
     @Then("the customer is shown his transactions only for the specified merchant")
@@ -246,11 +229,15 @@ public class ReportingCustomer {
         System.out.println("------------------------------");
 
         if (this.customerAccountNumber != null) {
-            // this.bank.retireAccount(this.customerAccountNumber);
+            this.bank.retireAccount(this.customerAccountNumber);
         }
 
         if (this.merchantAccountNumberA != null) {
-            // this.bank.retireAccount(this.merchantAccountNumber);
+            this.bank.retireAccount(this.merchantAccountNumberA);
+        }
+
+        if (this.merchantAccountNumberB != null) {
+            this.bank.retireAccount(this.merchantAccountNumberB);
         }
 
         if (this.currentCustomer != null) {
