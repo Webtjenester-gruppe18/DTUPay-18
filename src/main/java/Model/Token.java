@@ -5,11 +5,18 @@ import java.util.UUID;
 public class Token {
 
     private String value;
-    private boolean valid;
+    private String customerCpr;
+    private boolean hasBeenUsed;
 
     public Token() {
         this.value = UUID.randomUUID().toString();
-        this.valid = true;
+        this.hasBeenUsed = false;
+    }
+
+    public Token(String customerCpr) {
+        this.customerCpr = customerCpr;
+        this.value = UUID.randomUUID().toString();
+        this.hasBeenUsed = false;
     }
 
     public String getValue() {
@@ -20,11 +27,19 @@ public class Token {
         this.value = value;
     }
 
-    public boolean isValid() {
-        return valid;
+    public boolean isHasBeenUsed() {
+        return hasBeenUsed;
     }
 
-    public void setValid(boolean valid) {
-        this.valid = valid;
+    public void setHasBeenUsed(boolean hasBeenUsed) {
+        this.hasBeenUsed = hasBeenUsed;
+    }
+
+    public String getCustomerCpr() {
+        return customerCpr;
+    }
+
+    public void setCustomerCpr(String customerCpr) {
+        this.customerCpr = customerCpr;
     }
 }

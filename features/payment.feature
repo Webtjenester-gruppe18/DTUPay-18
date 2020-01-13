@@ -1,22 +1,31 @@
 Feature: Make payment
 
   Scenario: Customer makes a payment
-    Given the customer is registered with a account balance 1000
-    And the customer have at least 1 unused token
-    And A merchant that is registered with a account balance 1000
+    Given the customer is registered with an account balance 1000
+    And the customer has at least 1 unused token
+    And a merchant that is registered with an account balance 1000
     When the customer pays the merchant 100 kr
-    Then the money is transferred from the customer to merchant
+    Then the customer account balance is 900 kr
+    And the merchant account balance is 1100 kr
 
   Scenario: Customer tries to pay with a used token
-    Given the customer is registered with a account balance 1000
-    And the customer have at least 1 used token
-    And A merchant that is registered with a account balance 1000
-    When the customer pay 100 with a used token
+    Given the customer is registered with an account balance 1000
+    And the customer has at least 1 unused token
+    And a merchant that is registered with an account balance 1000
+    When the customer pays the merchant 100 kr
+    Then the customer account balance is 900 kr
+    And the merchant account balance is 1100 kr
+    When the customer pays again 100 kr with the same token
     Then the payment is rejected with the error message "The token is not valid."
 
   Scenario: Customer tries to pay with a fake token
-    Given the customer is registered with a account balance 1000
-    And a token not attached to the customer
-    And A merchant that is registered with a account balance 1000
-    When the customer pay 100 with a fake token
+    Given a customer that is registered
+    And an token unknown to DTU Pay
+    When the merchant uses this token for payment
     Then the payment is rejected with the error message "The token is not valid."
+
+#  Scenario: Customer tries to pay but don't have nok
+#    Given the customer is registered with an account balance 1000
+#    And the customer has at least 1 unused token
+#    When the customer pays the merchant 1100 kr
+#    Then the payment is rejected with the error message "The token is not valid."

@@ -1,23 +1,21 @@
 package Control;
 import Bank.Bank;
 import Bank.IBank;
-import Database.IDatabase;
-import Database.InMemoryDatabase;
+import Database.ITokenDatabase;
+import Database.InMemoryTokenDatabase;
 import Exception.ExceptionContainer;
-import Service.TokenService;
-import Service.ValidationService;
+import Service.ITokenManager;
+import Service.TokenManager;
+import dtu.ws.fastmoney.BankService;
+import Bank.InMemoryBankService;
+import dtu.ws.fastmoney.BankServiceService;
 
 public class ControlReg {
-    private static IDatabase database;
     private static ExceptionContainer exceptionContainer;
-    private static TokenService tokenService;
-    private static ValidationService validationService;
     private static IBank bank;
-
-    public static IDatabase getDatabase() {
-        if (database == null) database = new InMemoryDatabase();
-        return database;
-    }
+    private static ITokenDatabase tokenDatabase;
+    private static ITokenManager tokenManager;
+    private static BankService bankService;
 
     public static IBank getBank() {
         if (bank == null) bank = new Bank();
@@ -29,14 +27,19 @@ public class ControlReg {
         return exceptionContainer;
     }
 
-    public static TokenService getTokenService() {
-        if (tokenService == null) tokenService = new TokenService();
-        return tokenService;
+    public static ITokenDatabase getTokenDatabase() {
+        if (tokenDatabase == null) tokenDatabase = new InMemoryTokenDatabase();
+        return tokenDatabase;
     }
 
-    public static ValidationService getValidationService() {
-        if (validationService == null) validationService = new ValidationService();
-        return validationService;
+    public static ITokenManager getTokenManager() {
+        if (tokenManager == null) tokenManager = new TokenManager();
+        return tokenManager;
+    }
+
+    public static BankService getBankService() {
+//        if (bankService == null) bankService = new InMemoryBankService();
+        if (bankService == null) bankService = new BankServiceService().getBankServicePort();
+        return bankService;
     }
 }
-

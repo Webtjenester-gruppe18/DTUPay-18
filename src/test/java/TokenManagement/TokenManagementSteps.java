@@ -2,88 +2,72 @@ package TokenManagement;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-
 import Control.ControlReg;
 import Exception.*;
-import Database.IDatabase;
-import Exception.TokenValidationException;
-import Model.Customer;
-import Model.Merchant;
 import Model.Token;
-import Service.TokenService;
-import Service.ValidationService;
+import Service.ITokenManager;
+import dtu.ws.fastmoney.User;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.After;
 
 import java.util.ArrayList;
 
 public class TokenManagementSteps {
 
-    private IDatabase database;
-    private TokenService tokenService;
-    private Customer currentCustomer;
-    private Merchant currentMerchant;
-    private ArrayList<Token> requestedTokens;
-    private ExceptionContainer exceptionContainer;
-    private Token paymentToken;
-    private ValidationService validationService;
-    private double paymentPrice;
-    private double customerPreviousBalance;
-    private double merchantPreviousBalance;
+    private User currentCustomer;
+    private ITokenManager tokenManager;
+    private ArrayList<Token> tokensReceived;
 
     @Before
     public void setUp() {
-        this.database = ControlReg.getDatabase();
-        this.tokenService = ControlReg.getTokenService();
-        this.validationService = ControlReg.getValidationService();
-        this.requestedTokens = new ArrayList<>();
-        this.exceptionContainer = new ExceptionContainer();
+        this.tokenManager = ControlReg.getTokenManager();
     }
 
     @Given("the customer is registered")
     public void theCustomerIsRegistered() {
-        this.currentCustomer = new Customer("John Doe");
-        this.database.addCustomer(currentCustomer);
+        User customer = new User();
+        customer.setCprNumber("991199-0000");
+        customer.setFirstName("Jane");
+        customer.setLastName("Doe");
 
-        assertThat(this.database.getCustomer(currentCustomer.getId()), is(equalTo(currentCustomer)));
+        this.currentCustomer = customer;
     }
 
-    @Given("the customer have {int} unused token left")
-    public void theCustomerHaveUnusedTokenLeft(Integer amountOfTokens) {
-        ArrayList<Token> generatedTokens = tokenService.generateTokens(amountOfTokens);
-        this.currentCustomer.addTokens(generatedTokens);
-
-        assertThat(this.database.getCustomer(this.currentCustomer.getId()).getTokens().size(), is(equalTo(generatedTokens.size())));
-        assertThat(this.database.getCustomer(this.currentCustomer.getId()).getTokens().get(0), is(equalTo(generatedTokens.get(0))));
-    }
-
-    @When("the customer request more tokens")
-    public void theCustomerRequestMoreTokens() {
+    @Given("the customer has not more than {int} unused token left")
+    public void theCustomerHasNotMoreThanUnusedTokenLeft(Integer tokensLeft) {
         try {
-            ArrayList<Token> tokens = this.tokenService.requestNewTokens(this.currentCustomer.getTokens());
-            this.requestedTokens = tokens;
+            this.tokenManager.generateTokens(this.currentCustomer, tokensLeft);
         } catch (TooManyTokensException e) {
-            this.exceptionContainer.setErrorMessage(e.getMessage());
+            System.out.println("1 " + e.getMessage());
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
 
-    @Then("the service create {int} new unused tokens")
-    public void theServiceCreateNewUnusedTokens(Integer amountOfTokensReceived) {
-        assertThat(this.requestedTokens.size(), is(equalTo(amountOfTokensReceived)));
+    @When("the customer requests more tokens")
+    public void theCustomerRequestsMoreTokens() {
+        try {
+            this.tokensReceived = this.tokenManager.requestForNewTokens(this.currentCustomer);
+        } catch (TooManyTokensException e) {
+            System.out.println("2 " + e.getMessage());
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
     }
 
-    @Then("the customer receive the tokens, and have {int} unused tokens")
-    public void theCustomerReceiveTheTokensAndHaveUnusedTokens(Integer totalAmountOfTokens) {
-        this.currentCustomer.addTokens(this.requestedTokens);
-
-        assertThat(this.currentCustomer.getTokens().size(), is(equalTo(totalAmountOfTokens)));
+    @Then("the customer receives {int} new unused tokens")
+    public void theCustomerReceivesNewUnusedTokens(Integer amountOfReceivedTokens) {
+        assertThat(this.tokensReceived.size(), is(equalTo(amountOfReceivedTokens)));
     }
 
-    @Then("the customer gets a error message saying {string}")
-    public void theCustomerGetsAErrorMessageSaying(String errorMessage) {
-        assertThat(this.exceptionContainer.getErrorMessage(), is(equalTo(errorMessage)));
+    @Then("then has {int} unused tokens")
+    public void thenHasUnusedTokens(Integer amountOfTokensAttachedToTheUserAccount) {
+        assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), equalTo(amountOfTokensAttachedToTheUserAccount));
     }
 
+    @After
+    public void tearDown() {
+        this.tokenManager.clearUserTokens(this.currentCustomer.getCprNumber());
+    }
 }
