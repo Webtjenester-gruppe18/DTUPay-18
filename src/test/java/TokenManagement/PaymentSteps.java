@@ -19,7 +19,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import java.math.BigDecimal;
 
-public class TokenPaymentSteps {
+public class PaymentSteps {
 
     private IBank bank;
     private ITokenManager tokenManager;
@@ -30,7 +30,7 @@ public class TokenPaymentSteps {
     private Token currentToken;
 
     @Before
-    public void setUp(Scenario scenario) {
+    public void setUp() {
 
         this.bank = ControlReg.getBank();
         this.tokenManager = ControlReg.getTokenManager();
