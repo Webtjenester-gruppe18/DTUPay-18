@@ -38,6 +38,7 @@ public class ControlReg {
 
     public static BankService getBankService() {
         if (bankService == null) bankService = new InMemoryBankService();
+//        if (bankService == null) bankService = new BankServiceService().getBankServicePort();
         return bankService;
     }
 }
