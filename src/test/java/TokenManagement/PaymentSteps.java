@@ -2,11 +2,12 @@ package TokenManagement;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import Bank.IBank;
+import Service.IBankService;
 import Control.ControlReg;
 import Exception.*;
 import Exception.TokenValidationException;
 import Model.Token;
+import Service.IPaymentService;
 import Service.ITokenManager;
 import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankServiceException_Exception;
@@ -21,8 +22,9 @@ import java.math.BigDecimal;
 
 public class PaymentSteps {
 
-    private IBank bank;
+    private IBankService bankService;
     private ITokenManager tokenManager;
+    private IPaymentService paymentService;
     private String customerAccountNumber;
     private String merchantAccountNumber;
     private User currentCustomer;
@@ -32,8 +34,9 @@ public class PaymentSteps {
     @Before
     public void setUp() {
 
-        this.bank = ControlReg.getBank();
+        this.bankService = ControlReg.getBankService();
         this.tokenManager = ControlReg.getTokenManager();
+        this.paymentService = ControlReg.getPaymentService();
     }
 
     @Given("the customer is registered with an account balance {int}")
@@ -46,14 +49,14 @@ public class PaymentSteps {
         this.currentCustomer = customer;
 
         try {
-            this.customerAccountNumber = this.bank.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(balance));
+            this.customerAccountNumber = this.bankService.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(balance));
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
         Account customerAccount = null;
         try {
-            customerAccount = this.bank.getAccount(this.customerAccountNumber);
+            customerAccount = this.bankService.getAccount(this.customerAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -82,14 +85,14 @@ public class PaymentSteps {
         this.currentMerchant = merchant;
 
         try {
-            this.merchantAccountNumber = this.bank.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(balance));
+            this.merchantAccountNumber = this.bankService.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(balance));
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
         Account customerAccount = null;
         try {
-            customerAccount = this.bank.getAccount(this.merchantAccountNumber);
+            customerAccount = this.bankService.getAccount(this.merchantAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -101,7 +104,7 @@ public class PaymentSteps {
     public void theCustomerPaysTheMerchantKr(Integer price) {
         try {
             this.currentToken = this.tokenManager.getUnusedTokensByCpr(this.currentCustomer.getCprNumber()).get(0);
-            this.bank.transferMoneyFromTo(
+            this.paymentService.performPayment(
                     this.customerAccountNumber,
                     this.merchantAccountNumber,
                     BigDecimal.valueOf(price),
@@ -119,7 +122,7 @@ public class PaymentSteps {
 
         Account customerAccount = null;
         try {
-            customerAccount = this.bank.getAccount(this.customerAccountNumber);
+            customerAccount = this.bankService.getAccount(this.customerAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -131,7 +134,7 @@ public class PaymentSteps {
     public void theMerchantAccountBalanceIsKr(Integer merchantAccountBalance) {
         Account merchantAccount = null;
         try {
-            merchantAccount = this.bank.getAccount(this.merchantAccountNumber);
+            merchantAccount = this.bankService.getAccount(this.merchantAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -179,7 +182,7 @@ public class PaymentSteps {
     @When("the customer pays again {int} kr with the same token")
     public void theCustomerPaysAgainKrWithTheSameToken(Integer price) {
         try {
-            this.bank.transferMoneyFromTo(
+            this.paymentService.performPayment(
                     this.customerAccountNumber,
                     this.merchantAccountNumber,
                     BigDecimal.valueOf(price),
@@ -201,11 +204,11 @@ public class PaymentSteps {
         System.out.println("------------------------------");
 
         if (this.customerAccountNumber != null) {
-            this.bank.retireAccount(this.customerAccountNumber);
+            this.bankService.retireAccount(this.customerAccountNumber);
         }
 
         if (this.merchantAccountNumber != null) {
-            this.bank.retireAccount(this.merchantAccountNumber);
+            this.bankService.retireAccount(this.merchantAccountNumber);
         }
 
         if (this.currentCustomer != null) {

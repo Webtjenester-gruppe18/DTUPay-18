@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class InMemoryBankService implements BankService {
+public class InMemoryBankService implements dtu.ws.fastmoney.BankService {
 
     private ArrayList<Account> accounts = new ArrayList<>();
     private ArrayList<AccountInfo> accountInfo = new ArrayList<>();

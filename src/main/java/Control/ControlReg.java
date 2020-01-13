@@ -1,24 +1,20 @@
 package Control;
-import Bank.Bank;
-import Bank.IBank;
 import Database.ITokenDatabase;
 import Database.InMemoryTokenDatabase;
 import Exception.ExceptionContainer;
-import Service.ITokenManager;
-import Service.TokenManager;
-import dtu.ws.fastmoney.BankService;
-import Bank.InMemoryBankService;
+import Service.*;
 import dtu.ws.fastmoney.BankServiceService;
 
 public class ControlReg {
     private static ExceptionContainer exceptionContainer;
-    private static IBank bank;
+    private static IBankService bank;
     private static ITokenDatabase tokenDatabase;
     private static ITokenManager tokenManager;
-    private static BankService bankService;
+    private static dtu.ws.fastmoney.BankService bankService;
+    private static IPaymentService paymentService;
 
-    public static IBank getBank() {
-        if (bank == null) bank = new Bank();
+    public static IBankService getBankService() {
+        if (bank == null) bank = new BankService();
         return bank;
     }
 
@@ -37,9 +33,13 @@ public class ControlReg {
         return tokenManager;
     }
 
-    public static BankService getBankService() {
-//        if (bankService == null) bankService = new InMemoryBankService();
+    public static dtu.ws.fastmoney.BankService getFastMoneyBankService() {
         if (bankService == null) bankService = new BankServiceService().getBankServicePort();
         return bankService;
+    }
+
+    public static IPaymentService getPaymentService() {
+        if (paymentService == null) paymentService = new PaymentService();
+        return paymentService;
     }
 }

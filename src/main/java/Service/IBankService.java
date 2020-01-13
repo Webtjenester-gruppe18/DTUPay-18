@@ -1,4 +1,4 @@
-package Bank;
+package Service;
 
 import Model.Token;
 import dtu.ws.fastmoney.Account;
@@ -8,7 +8,7 @@ import Exception.*;
 
 import java.math.BigDecimal;
 
-public interface IBank {
+public interface IBankService {
 
     String createAccountWithBalance(User user, BigDecimal initialBalance) throws BankServiceException_Exception;
     Account getAccount(String accountNumber) throws BankServiceException_Exception;
