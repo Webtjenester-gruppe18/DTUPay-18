@@ -99,7 +99,7 @@ public class ReportingCustomer {
     public void theCustomerIsRegisteredWithAnAccount() {
         Integer startBalance = 1000;
 
-
+        /*
         // Create customer account in fastmoney
         try {
             this.customerAccountNumber = this.bank.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(startBalance));
@@ -113,7 +113,7 @@ public class ReportingCustomer {
             this.merchantAccountNumber = this.bank.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(startBalance));
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
+        }*/
 
         /*
         Account customerAccountExpected = null;
@@ -133,23 +133,16 @@ public class ReportingCustomer {
         try {
             this.customerTransactions = this.bank.getAccount(this.customerAccountNumber).getTransactions();
 
-            for (Transaction transaction : this.customerTransactions) {
-                System.out.print(transaction);
-            }
-
         } catch (BankServiceException_Exception e) {
             e.printStackTrace();
         }
-        //currentCustomer.
-
-        // Write code here that turns the phrase above into concrete actions
-        // throw new cucumber.api.PendingException();
     }
 
     @Then("the customer is shown his transactions")
     public void the_customer_is_shown_his_transactions() {
-        // Write code here that turns the phrase above into concrete actions
-        // throw new cucumber.api.PendingException();
+        for (Transaction transaction : this.customerTransactions) {
+            System.out.print("\n" + "Time: " + transaction.getTime() + " | Description: " + transaction.getDescription() + " | Debtor: " + transaction.getDebtor() + " | Creditor: " + transaction.getCreditor());
+        }
     }
 
     // -- Merchant
