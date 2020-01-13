@@ -32,10 +32,6 @@ public class TokenPaymentSteps {
     @Before
     public void setUp(Scenario scenario) {
 
-        System.out.println("------------------------------");
-        System.out.println("Starting - " + scenario.getName());
-        System.out.println("------------------------------");
-
         this.bank = ControlReg.getBank();
         this.tokenManager = ControlReg.getTokenManager();
     }

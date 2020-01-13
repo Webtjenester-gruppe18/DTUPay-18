@@ -36,7 +36,7 @@ public class TokenManagementSteps {
         this.currentCustomer = customer;
     }
 
-    @Given("the customer has not more than {int} unused token left")
+    @Given("the customer has no more than {int} unused token left")
     public void theCustomerHasNotMoreThanUnusedTokenLeft(Integer tokensLeft) {
         try {
             this.tokenManager.generateTokens(this.currentCustomer, tokensLeft);
@@ -64,6 +64,20 @@ public class TokenManagementSteps {
     @Then("then has {int} unused tokens")
     public void thenHasUnusedTokens(Integer amountOfTokensAttachedToTheUserAccount) {
         assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), equalTo(amountOfTokensAttachedToTheUserAccount));
+    }
+
+    @Given("the customer has atleast {int} unused token left")
+    public void theCustomerHasAtleastUnusedTokenLeft(Integer amountOfTokens) {
+        try {
+            this.tokenManager.requestForNewTokens(this.currentCustomer);
+        } catch (TooManyTokensException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+    }
+
+    @Then("the customer gets a error message saying {string}")
+    public void theCustomerGetsAErrorMessageSaying(String errorMessage) {
+        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(errorMessage)));
     }
 
     @After
