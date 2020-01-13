@@ -2,6 +2,7 @@ package Reporting;
 
 import Bank.IBank;
 import Control.ControlReg;
+import Helpers.AccountHelper;
 import Model.Token;
 import Exception.*;
 import Service.ITokenManager;
@@ -13,10 +14,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
 public class ReportingCustomer {
 
@@ -121,7 +124,6 @@ public class ReportingCustomer {
         }*/
     }
 
-
     // -- Common
 
     @Given("the customer is registered with an account")
@@ -178,7 +180,7 @@ public class ReportingCustomer {
     @Then("the customer is shown his transactions")
     public void the_customer_is_shown_his_transactions() {
         for (Transaction transaction : this.customerTransactions) {
-            System.out.print("\n" + "Time: " + transaction.getTime() + " | Description: " + transaction.getDescription() + " | Debtor: " + transaction.getDebtor() + " | Creditor: " + transaction.getCreditor());
+            System.out.print("Time: " + transaction.getTime() + " | Description: " + transaction.getDescription() + " | Debtor: " + transaction.getDebtor() + " | Creditor: " + AccountHelper.getAccountFirstName(transaction.getCreditor(), this.bank) + "\n");
         }
     }
 
@@ -186,6 +188,18 @@ public class ReportingCustomer {
 
     @When("the customer filters his transactions by merchant")
     public void the_customer_filters_his_transactions_by_merchant() {
+        /*
+        String merchantFilter = "Kebabistan"; // accountNumber: d6c8f2e1-2134-4002-b01c-0a428510882b
+
+        try {
+            this.bank.getAccount(this.merchantAccountNumberA).getUser().getFirstName();
+        } catch (BankServiceException_Exception e) {
+            e.printStackTrace();
+        }
+
+        assertThat(this.customerTransactions, containsInAnyOrder(""));
+        */
+
         // Write code here that turns the phrase above into concrete actions
         // throw new cucumber.api.PendingException();
     }
