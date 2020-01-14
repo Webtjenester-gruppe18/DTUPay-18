@@ -1,11 +1,11 @@
 package Reporting;
 
-import Bank.IBank;
 import Control.ControlReg;
 import Helpers.AccountHelper;
 import Helpers.DateHelper;
 import Model.Token;
 import Exception.*;
+import Service.IBankService;
 import Service.ITokenManager;
 import dtu.ws.fastmoney.*;
 import io.cucumber.core.api.Scenario;
@@ -16,17 +16,11 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+public class CustomerReportSteps {
 
-public class ReportingCustomer {
-
-    private IBank bank;
+    private IBankService bank;
     private ITokenManager tokenManager;
     private String customerAccountNumber;
     private String merchantAccountNumberA;
@@ -45,7 +39,7 @@ public class ReportingCustomer {
         System.out.println("Starting - " + scenario.getName());
         System.out.println("------------------------------");
 
-        this.bank = ControlReg.getBank();
+        this.bank = ControlReg.getBankService();
         this.tokenManager = ControlReg.getTokenManager();
     }
 
@@ -191,7 +185,7 @@ public class ReportingCustomer {
     @Then("the customer is shown his transactions")
     public void the_customer_is_shown_his_transactions() {
         for (Transaction transaction : this.customerTransactions) {
-            System.out.print("Time: " + DateHelper.formatUniversalDate(transaction.getTime()) + " | Amount: " + transaction.getAmount() + " | Description: " + transaction.getDescription() + " | Debtor: " + transaction.getDebtor() + " | Creditor: " + AccountHelper.getAccountFirstName(transaction.getCreditor(), this.bank) + "\n");
+//            System.out.print("Time: " + DateHelper.formatUniversalDate(transaction.getTime()) + " | Amount: " + transaction.getAmount() + " | Description: " + transaction.getDescription() + " | Debtor: " + transaction.getDebtor() + " | Creditor: " + AccountHelper.getAccountFirstName(transaction.getCreditor(), this.bank) + "\n");
         }
     }
 

@@ -1,11 +1,11 @@
 package Helpers;
 
-import Bank.IBank;
+import Service.IBankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 
 public class AccountHelper {
 
-    public static String getAccountFirstName(String accountNumber, IBank bank) {
+    public static String getAccountFirstName(String accountNumber, IBankService bank) {
         String accountFirstName = "";
 
         try {
