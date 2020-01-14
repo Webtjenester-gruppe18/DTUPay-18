@@ -4,10 +4,11 @@ Feature: Create a report with customer transactions
     # (amount of money transferred, with which merchant, and token used) in a given time period.
   # This forms the bases of a monthly status report sent to the customer.
 
-  Scenario: Customer tries to view his transactions
-    Given the customer is registered with an account
-    When the customer views his transactions
-    Then the customer is shown his transactions
+  Scenario: Customer request to an overview of his transactions
+  Given a registered customer with an account
+  And the customer has performed atleast one transaction
+  When the customer requests for an overview
+  Then an overview is create with one transaction
 
 #  Scenario: Customer tries to view his transactions filtered by merchant
 #    Given the customer is registered with an account

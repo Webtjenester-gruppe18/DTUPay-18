@@ -13,6 +13,7 @@ public class ControlReg {
     private static ITokenManager tokenManager;
     private static dtu.ws.fastmoney.BankService bankService;
     private static IPaymentService paymentService;
+    private static IReportingService reportingService;
 
     public static IBankService getBankService() {
         if (bank == null) bank = new BankService();
@@ -43,5 +44,10 @@ public class ControlReg {
     public static IPaymentService getPaymentService() {
         if (paymentService == null) paymentService = new PaymentService();
         return paymentService;
+    }
+
+    public static IReportingService getReportingService() {
+        if (reportingService == null) reportingService = new ReportingService();
+        return reportingService;
     }
 }
