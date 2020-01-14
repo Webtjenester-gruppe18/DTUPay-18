@@ -1,4 +1,5 @@
 package Control;
+import Bank.InMemoryBankService;
 import Database.ITokenDatabase;
 import Database.InMemoryTokenDatabase;
 import Exception.ExceptionContainer;
@@ -35,6 +36,7 @@ public class ControlReg {
 
     public static dtu.ws.fastmoney.BankService getFastMoneyBankService() {
         if (bankService == null) bankService = new BankServiceService().getBankServicePort();
+//        if (bankService == null) bankService = new InMemoryBankService();
         return bankService;
     }
 
