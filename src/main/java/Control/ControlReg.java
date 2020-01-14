@@ -35,8 +35,8 @@ public class ControlReg {
     }
 
     public static dtu.ws.fastmoney.BankService getFastMoneyBankService() {
-        if (bankService == null) bankService = new BankServiceService().getBankServicePort();
-//        if (bankService == null) bankService = new InMemoryBankService();
+//        if (bankService == null) bankService = new BankServiceService().getBankServicePort();
+        if (bankService == null) bankService = new InMemoryBankService();
         return bankService;
     }
 
