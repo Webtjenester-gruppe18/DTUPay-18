@@ -59,6 +59,14 @@ public class ReportingCustomer {
 
         this.currentCustomer = customer;
 
+        /*
+        // Remove cusotmer account in case it exists
+        try {
+            this.bank.retireAccount(this.currentCustomer.getCprNumber());
+        } catch (BankServiceException_Exception e) {
+            e.printStackTrace();
+        }*/
+
         // Create customer account in fastmoney
         try {
             this.customerAccountNumber = this.bank.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(startBalance));
@@ -91,6 +99,15 @@ public class ReportingCustomer {
 
         this.currentMerchantA = merchantA;
         this.currentMerchantB = merchantB;
+
+        /*
+        // Remove merchant A and B account in case it exists
+        try {
+            this.bank.retireAccount(this.currentMerchantA.getCprNumber());
+            this.bank.retireAccount(this.currentMerchantB.getCprNumber());
+        } catch (BankServiceException_Exception e) {
+            e.printStackTrace();
+        }*/
 
         // Create merchant A account in fastmoney
         try {
