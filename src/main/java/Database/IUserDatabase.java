@@ -9,7 +9,7 @@ public interface IUserDatabase {
 
     User getCustomer(String cprNumber) throws UserNotFoundException;
 
-    User getMerchant(String cprNumber);
+    User getMerchant(String cprNumber) throws UserNotFoundException;
 
     ArrayList<User> getAllCustomers();
 

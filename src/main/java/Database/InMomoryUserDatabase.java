@@ -8,8 +8,8 @@ import Exception.UserNotFoundException;
 
 public class InMomoryUserDatabase implements IUserDatabase {
 
-    ArrayList<User> customers = new ArrayList<>();
-    ArrayList<User> merchants = new ArrayList<>();
+    private ArrayList<User> customers = new ArrayList<>();
+    private ArrayList<User> merchants = new ArrayList<>();
 
 
     @Override
@@ -24,8 +24,14 @@ public class InMomoryUserDatabase implements IUserDatabase {
     }
 
     @Override
-    public User getMerchant(String cprNumber) {
-        return null;
+    public User getMerchant(String cprNumber) throws UserNotFoundException {
+
+        for (User currentMerchant : this.customers) {
+            if (currentMerchant.getCprNumber().equals(cprNumber)){
+                return currentMerchant;
+            }
+        }
+        throw new UserNotFoundException("Could not find a user on that cprNumber");
     }
 
     @Override
@@ -64,7 +70,9 @@ public class InMomoryUserDatabase implements IUserDatabase {
 
     @Override
     public boolean deleteMerchant(User merchant) {
+
         this.merchants.remove(merchant);
+        
         return true;
     }
 }

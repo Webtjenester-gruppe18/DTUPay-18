@@ -24,8 +24,9 @@ public class UserService implements IUserService {
     @Override
     public boolean merchantExists(User merchant) {
         for (User currentMerchant : database.getAllMerchants()) {
-            if (currentMerchant.equals(merchant));
-            return true;
+            if (currentMerchant.equals(merchant)){
+                return true;
+            }
         }
 
         return false;

@@ -245,6 +245,11 @@ public class UserManagementSteps {
         this.userService.deleteMerchant(this.currentUser);
     }
 
+    /*
+    * Måske mangler der et step for merchant, @Then (the account was deleted), dette step er dog aktuelt for customer, bruger
+    * disse to users den samme metode til at slette.
+    * */
+
     @After
     public void tearDown(Scenario scenario) throws BankServiceException_Exception {
 
