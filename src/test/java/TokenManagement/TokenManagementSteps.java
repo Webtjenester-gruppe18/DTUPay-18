@@ -1,7 +1,6 @@
 package TokenManagement;
+import static org.junit.Assert.assertEquals;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
 import Control.ControlReg;
 import Exception.*;
 import Model.Token;
@@ -12,6 +11,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.After;
+import org.junit.Assert;
 
 import java.util.ArrayList;
 
@@ -36,12 +36,11 @@ public class TokenManagementSteps {
         this.currentCustomer = customer;
     }
 
-    @Given("the customer has not more than {int} unused token left")
+    @Given("the customer has no more than {int} unused token left")
     public void theCustomerHasNotMoreThanUnusedTokenLeft(Integer tokensLeft) {
         try {
             this.tokenManager.generateTokens(this.currentCustomer, tokensLeft);
         } catch (TooManyTokensException e) {
-            System.out.println("1 " + e.getMessage());
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
@@ -51,19 +50,32 @@ public class TokenManagementSteps {
         try {
             this.tokensReceived = this.tokenManager.requestForNewTokens(this.currentCustomer);
         } catch (TooManyTokensException e) {
-            System.out.println("2 " + e.getMessage());
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
 
     @Then("the customer receives {int} new unused tokens")
     public void theCustomerReceivesNewUnusedTokens(Integer amountOfReceivedTokens) {
-        assertThat(this.tokensReceived.size(), is(equalTo(amountOfReceivedTokens)));
+        assertEquals(Integer.valueOf(this.tokensReceived.size()), amountOfReceivedTokens);
     }
 
     @Then("then has {int} unused tokens")
     public void thenHasUnusedTokens(Integer amountOfTokensAttachedToTheUserAccount) {
-        assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), equalTo(amountOfTokensAttachedToTheUserAccount));
+        assertEquals(Integer.valueOf(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size()), amountOfTokensAttachedToTheUserAccount);
+    }
+
+    @Given("the customer has atleast {int} unused token left")
+    public void theCustomerHasAtleastUnusedTokenLeft(Integer amountOfTokens) {
+        try {
+            this.tokenManager.requestForNewTokens(this.currentCustomer);
+        } catch (TooManyTokensException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+    }
+
+    @Then("the customer gets a error message saying {string}")
+    public void theCustomerGetsAErrorMessageSaying(String errorMessage) {
+        assertEquals(ControlReg.getExceptionContainer().getErrorMessage(), errorMessage);
     }
 
     @After

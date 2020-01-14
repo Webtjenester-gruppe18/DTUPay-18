@@ -24,8 +24,8 @@ Feature: Make payment
     When the merchant uses this token for payment
     Then the payment is rejected with the error message "The token is not valid."
 
-#  Scenario: Customer tries to pay but don't have nok
-#    Given the customer is registered with an account balance 1000
-#    And the customer has at least 1 unused token
-#    When the customer pays the merchant 1100 kr
-#    Then the payment is rejected with the error message "The token is not valid."
+  Scenario: Customer tries to pay but don't have enough money on the account
+    Given the customer is registered with an account balance 200
+    And the customer has at least 1 unused token
+    When the customer pays the merchant 500 kr
+    Then the payment is rejected with the error message "You have not enough money."

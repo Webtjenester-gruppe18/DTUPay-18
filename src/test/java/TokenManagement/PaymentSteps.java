@@ -1,12 +1,12 @@
 package TokenManagement;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
-import Bank.IBank;
+import Service.IBankService;
 import Control.ControlReg;
 import Exception.*;
 import Exception.TokenValidationException;
 import Model.Token;
+import Service.IPaymentService;
 import Service.ITokenManager;
 import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankServiceException_Exception;
@@ -17,12 +17,14 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.math.BigDecimal;
 
-public class TokenPaymentSteps {
+public class PaymentSteps {
 
-    private IBank bank;
+    private IBankService bankService;
     private ITokenManager tokenManager;
+    private IPaymentService paymentService;
     private String customerAccountNumber;
     private String merchantAccountNumber;
     private User currentCustomer;
@@ -30,14 +32,11 @@ public class TokenPaymentSteps {
     private Token currentToken;
 
     @Before
-    public void setUp(Scenario scenario) {
+    public void setUp() {
 
-        System.out.println("------------------------------");
-        System.out.println("Starting - " + scenario.getName());
-        System.out.println("------------------------------");
-
-        this.bank = ControlReg.getBank();
+        this.bankService = ControlReg.getBankService();
         this.tokenManager = ControlReg.getTokenManager();
+        this.paymentService = ControlReg.getPaymentService();
     }
 
     @Given("the customer is registered with an account balance {int}")
@@ -50,19 +49,19 @@ public class TokenPaymentSteps {
         this.currentCustomer = customer;
 
         try {
-            this.customerAccountNumber = this.bank.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(balance));
+            this.customerAccountNumber = this.bankService.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(balance));
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
         Account customerAccount = null;
         try {
-            customerAccount = this.bank.getAccount(this.customerAccountNumber);
+            customerAccount = this.bankService.getAccount(this.customerAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
+        assertEquals(customerAccount.getBalance(), BigDecimal.valueOf(balance));
     }
 
     @Given("the customer has at least {int} unused token")
@@ -73,7 +72,7 @@ public class TokenPaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), is(equalTo(amountOfTokens)));
+        assertEquals(Integer.valueOf(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size()), amountOfTokens);
     }
 
     @Given("a merchant that is registered with an account balance {int}")
@@ -86,26 +85,26 @@ public class TokenPaymentSteps {
         this.currentMerchant = merchant;
 
         try {
-            this.merchantAccountNumber = this.bank.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(balance));
+            this.merchantAccountNumber = this.bankService.createAccountWithBalance(this.currentMerchant, BigDecimal.valueOf(balance));
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        Account customerAccount = null;
+        Account merchantAccount = null;
         try {
-            customerAccount = this.bank.getAccount(this.merchantAccountNumber);
+            merchantAccount = this.bankService.getAccount(this.merchantAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
+        assertEquals(merchantAccount.getBalance(), BigDecimal.valueOf(balance));
     }
 
     @When("the customer pays the merchant {int} kr")
     public void theCustomerPaysTheMerchantKr(Integer price) {
         try {
             this.currentToken = this.tokenManager.getUnusedTokensByCpr(this.currentCustomer.getCprNumber()).get(0);
-            this.bank.transferMoneyFromTo(
+            this.paymentService.performPayment(
                     this.customerAccountNumber,
                     this.merchantAccountNumber,
                     BigDecimal.valueOf(price),
@@ -115,6 +114,8 @@ public class TokenPaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        } catch (NotEnoughMoneyException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
 
@@ -123,24 +124,24 @@ public class TokenPaymentSteps {
 
         Account customerAccount = null;
         try {
-            customerAccount = this.bank.getAccount(this.customerAccountNumber);
+            customerAccount = this.bankService.getAccount(this.customerAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(customerAccountBalance))));
+        assertEquals(customerAccount.getBalance(), BigDecimal.valueOf(customerAccountBalance));
     }
 
     @Then("the merchant account balance is {int} kr")
     public void theMerchantAccountBalanceIsKr(Integer merchantAccountBalance) {
         Account merchantAccount = null;
         try {
-            merchantAccount = this.bank.getAccount(this.merchantAccountNumber);
+            merchantAccount = this.bankService.getAccount(this.merchantAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(merchantAccount.getBalance(), is(equalTo(BigDecimal.valueOf(merchantAccountBalance))));
+        assertEquals(merchantAccount.getBalance(), BigDecimal.valueOf(merchantAccountBalance));
     }
 
     //
@@ -173,7 +174,7 @@ public class TokenPaymentSteps {
 
     @Then("the payment is rejected with the error message {string}")
     public void thePaymentIsRejectedWithTheErrorMessage(String errorMessage) {
-        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(errorMessage)));
+        assertEquals(ControlReg.getExceptionContainer().getErrorMessage(), errorMessage);
     }
 
     //
@@ -183,7 +184,7 @@ public class TokenPaymentSteps {
     @When("the customer pays again {int} kr with the same token")
     public void theCustomerPaysAgainKrWithTheSameToken(Integer price) {
         try {
-            this.bank.transferMoneyFromTo(
+            this.paymentService.performPayment(
                     this.customerAccountNumber,
                     this.merchantAccountNumber,
                     BigDecimal.valueOf(price),
@@ -192,6 +193,8 @@ public class TokenPaymentSteps {
         } catch (TokenValidationException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        } catch (NotEnoughMoneyException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
     }
@@ -205,11 +208,11 @@ public class TokenPaymentSteps {
         System.out.println("------------------------------");
 
         if (this.customerAccountNumber != null) {
-            this.bank.retireAccount(this.customerAccountNumber);
+            this.bankService.retireAccount(this.customerAccountNumber);
         }
 
         if (this.merchantAccountNumber != null) {
-            this.bank.retireAccount(this.merchantAccountNumber);
+            this.bankService.retireAccount(this.merchantAccountNumber);
         }
 
         if (this.currentCustomer != null) {
