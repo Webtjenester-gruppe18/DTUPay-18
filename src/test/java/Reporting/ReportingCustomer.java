@@ -3,6 +3,7 @@ package Reporting;
 import Bank.IBank;
 import Control.ControlReg;
 import Helpers.AccountHelper;
+import Helpers.DateHelper;
 import Model.Token;
 import Exception.*;
 import Service.ITokenManager;
@@ -15,6 +16,9 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -54,7 +58,6 @@ public class ReportingCustomer {
         customer.setLastName("Samir");
 
         this.currentCustomer = customer;
-        this.customerAccountNumber = "e65df606-3854-4115-82b9-9e49e3c8d460";
 
         // Create customer account in fastmoney
         try {
@@ -88,9 +91,6 @@ public class ReportingCustomer {
 
         this.currentMerchantA = merchantA;
         this.currentMerchantB = merchantB;
-
-        this.merchantAccountNumberA = "d6c8f2e1-2134-4002-b01c-0a428510882b";
-        this.merchantAccountNumberB = "a8f8afa2-c1bf-402a-847f-93370fb11263";
 
         // Create merchant A account in fastmoney
         try {
@@ -174,7 +174,7 @@ public class ReportingCustomer {
     @Then("the customer is shown his transactions")
     public void the_customer_is_shown_his_transactions() {
         for (Transaction transaction : this.customerTransactions) {
-            System.out.print("Time: " + transaction.getTime() + " | Description: " + transaction.getDescription() + " | Debtor: " + transaction.getDebtor() + " | Creditor: " + AccountHelper.getAccountFirstName(transaction.getCreditor(), this.bank) + "\n");
+            System.out.print("Time: " + DateHelper.formatUniversalDate(transaction.getTime()) + " | Amount: " + transaction.getAmount() + " | Description: " + transaction.getDescription() + " | Debtor: " + transaction.getDebtor() + " | Creditor: " + AccountHelper.getAccountFirstName(transaction.getCreditor(), this.bank) + "\n");
         }
     }
 
@@ -182,9 +182,9 @@ public class ReportingCustomer {
 
     @When("the customer filters his transactions by merchant")
     public void the_customer_filters_his_transactions_by_merchant() {
-        String merchantFilter = "d6c8f2e1-2134-4002-b01c-0a428510882b"; // Kebabistan accountNumber: d6c8f2e1-2134-4002-b01c-0a428510882b
+        String filterByMerchant = "Kebabistan"; // Kebabistan accountNumber: d6c8f2e1-2134-4002-b01c-0a428510882b
 
-        //assertThat(this.customerTransactions, containsInAnyOrder(merchantFilter));
+        //assertThat(this.customerTransactions, containsInAnyOrder(filterByMerchant));
     }
 
     @Then("the customer is shown his transactions only for the specified merchant")
@@ -203,6 +203,7 @@ public class ReportingCustomer {
 
     @Then("the customer is shown his transactions only for the specified date")
     public void the_customer_is_shown_his_transactions_only_for_the_specified_date() {
+
         // Write code here that turns the phrase above into concrete actions
         // throw new cucumber.api.PendingException();
     }
@@ -211,6 +212,8 @@ public class ReportingCustomer {
 
     @When("the customer filters his transactions by transaction amount")
     public void the_customer_filters_his_transactions_by_transaction_amount() {
+        Integer filterByAmount = 50;
+
         // Write code here that turns the phrase above into concrete actions
         // throw new cucumber.api.PendingException();
     }
