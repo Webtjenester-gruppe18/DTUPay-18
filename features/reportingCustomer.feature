@@ -5,10 +5,10 @@ Feature: Create a report with customer transactions
   # This forms the bases of a monthly status report sent to the customer.
 
   Scenario: Customer request to an overview of his transactions
-  Given a registered customer with an account
-  And the customer has performed atleast one transaction
-  When the customer requests for an overview
-  Then an overview is create with one transaction
+    Given a registered customer with an account
+    And the customer has performed atleast one transaction
+    When the customer requests for an overview
+    Then an overview is create with one transaction
 
 #  Scenario: Customer tries to view his transactions filtered by merchant
 #    Given the customer is registered with an account
