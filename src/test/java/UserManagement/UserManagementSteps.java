@@ -25,10 +25,13 @@ public class UserManagementSteps {
 
     private User currentUser;
     private IUserService userService;
+    private IBankService bankService;
+    private String currentAccountId;
 
     @Before
     public void setUp() throws Exception {
         this.userService = ControlReg.getUserService();
+        this.bankService = ControlReg.getBankService();
     }
 
     @Given("a customer is not already registered")
@@ -67,7 +70,7 @@ public class UserManagementSteps {
     public void the_customer_registers() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertThat(userService.customerExists(currentUser), equalTo(false));
+        assertThat(userService.customerExists(this.currentUser), equalTo(false));
 
         try {
             this.userService.saveCustomer(this.currentUser);
@@ -79,7 +82,7 @@ public class UserManagementSteps {
     @Then("the account is created and registered")
     public void the_account_is_created_and_registered() {
         // Write code here that turns the phrase above into concrete actions
-        assertThat(userService.customerExists(currentUser), equalTo(true));
+        assertThat(userService.customerExists(this.currentUser), equalTo(true));
     }
 
     @When("the customer tries to register with the same credentials")
@@ -96,40 +99,67 @@ public class UserManagementSteps {
     @Then("the customer will be rejected with the error message {string}")
     public void the_customer_will_be_rejected_with_the_error_message(String errorMessage) {
         // Write code here that turns the phrase above into concrete actions
-
         assertThat(ControlReg.getExceptionContainer().getErrorMessage(), equalTo(errorMessage));
-
     }
 
     @Given("a customer has an account")
     public void a_customer_has_an_account() {
         // Write code here that turns the phrase above into concrete actions
+        this.currentUser = new User();
 
+        this.currentUser.setFirstName("John");
+        this.currentUser.setLastName("Doe");
+        this.currentUser.setCprNumber("12345678");
 
+        try {
+            this.userService.saveCustomer(this.currentUser);
+        } catch (UserAlreadyExistsException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+        assertThat(userService.customerExists(this.currentUser), equalTo(true));
     }
 
     @When("the customer requests to delete the account")
     public void the_customer_requests_to_delete_the_account() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+        this.userService.deleteCustomer(this.currentUser);
     }
 
     @Then("the account will be deleted")
     public void the_account_will_be_deleted() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+
+        assertThat(userService.customerExists(this.currentUser), equalTo(false));
     }
 
     @Given("a customer that has an account with balance of {int} kr")
-    public void a_customer_that_has_an_account_with_balance_of_kr(Integer int1) {
+    public void a_customer_that_has_an_account_with_balance_of_kr(Integer balance) {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+
+        this.currentUser = new User();
+
+        this.currentUser.setFirstName("John");
+        this.currentUser.setLastName("Doe");
+        this.currentUser.setCprNumber("12345678");
+
+        try {
+            this.currentAccountId = this.bankService.createAccountWithBalance(this.currentUser, BigDecimal.valueOf(balance));
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+        Account customerAccount = null;
+        try {
+            customerAccount = this.bankService.getAccount(this.currentAccountId);
+        } catch (BankServiceException_Exception e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
     }
 
     @When("the customer adds {int} kr to the account")
-    public void the_customer_adds_kr_to_the_account(Integer int1) {
+    public void the_customer_adds_kr_to_the_account(Integer amount) {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+
     }
 
     @Then("the money will be added to the account")
@@ -147,42 +177,88 @@ public class UserManagementSteps {
     @Given("a merchant that is not already registered")
     public void a_merchant_that_is_not_already_registered() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+
+        this.currentUser = new User();
     }
 
     @When("the merchant tries to register")
     public void the_merchant_tries_to_register() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+
+        assertThat(userService.customerExists(this.currentUser), equalTo(false));
+
+        this.currentUser.setFirstName("Mikkel");
+        this.currentUser.setLastName("Hansen");
+        this.currentUser.setCprNumber("87654321");
+
+        try {
+            this.userService.saveMerchant(this.currentUser);
+        } catch (UserAlreadyExistsException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
     }
 
     @Then("the merchant has created a bank account with the credentials given")
     public void the_merchant_has_created_a_bank_account_with_the_credentials_given() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+
+        assertThat(userService.merchantExists(currentUser), equalTo(true));
     }
 
     @When("the merchant tries to register with the same credentials")
     public void the_merchant_tries_to_register_with_the_same_credentials() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+        try {
+            this.userService.saveMerchant(this.currentUser);
+        } catch (UserAlreadyExistsException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
     }
 
     @Then("the merchant will be rejected with the error message {string}")
-    public void the_merchant_will_be_rejected_with_the_error_message(String string) {
+    public void the_merchant_will_be_rejected_with_the_error_message(String errorMessage) {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), equalTo(errorMessage));
     }
 
     @Given("the merchant has an account")
     public void the_merchant_has_an_account() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+
+        this.currentUser = new User();
+
+        this.currentUser.setFirstName("Mikkel");
+        this.currentUser.setLastName("Hansen");
+        this.currentUser.setCprNumber("87654321");
+
+        try {
+            this.userService.saveMerchant(this.currentUser);
+        } catch (UserAlreadyExistsException e) {
+            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
+        }
+        assertThat(userService.merchantExists(this.currentUser), equalTo(true));
     }
 
     @When("the merchant requests to delete the account")
     public void the_merchant_requests_to_delete_the_account() {
         // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+        this.userService.deleteMerchant(this.currentUser);
     }
+
+    @After
+    public void tearDown(Scenario scenario) throws BankServiceException_Exception {
+
+        if (this.currentAccountId != null) {
+            this.bankService.retireAccount(this.currentAccountId);
+        }
+
+//        if (this.merchantAccountNumber != null) {
+//            this.bankService.retireAccount(this.merchantAccountNumber);
+//        }
+
+        if (this.currentUser != null) {
+            this.userService.deleteCustomer(currentUser);
+        }
+    }
+
 }

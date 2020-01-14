@@ -18,4 +18,8 @@ public interface IUserDatabase {
     String saveCustomer(User customer);
 
     String saveMerchant(User merchant);
+
+    boolean deleteCustomer(User customer);
+
+    boolean deleteMerchant(User merchant);
 }

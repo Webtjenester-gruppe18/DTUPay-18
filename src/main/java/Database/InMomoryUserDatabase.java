@@ -53,4 +53,18 @@ public class InMomoryUserDatabase implements IUserDatabase {
 
         return merchant.getCprNumber();
     }
+
+    @Override
+    public boolean deleteCustomer(User customer) {
+
+        this.customers.remove(customer);
+
+        return true;
+    }
+
+    @Override
+    public boolean deleteMerchant(User merchant) {
+        this.merchants.remove(merchant);
+        return true;
+    }
 }

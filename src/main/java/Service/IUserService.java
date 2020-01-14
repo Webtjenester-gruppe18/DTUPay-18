@@ -11,5 +11,9 @@ public interface IUserService {
 
     String saveCustomer(User customer) throws UserAlreadyExistsException;
 
-    String saveMerchant(User merchant);
+    String saveMerchant(User merchant) throws UserAlreadyExistsException;
+
+    boolean deleteCustomer(User customer);
+
+    boolean deleteMerchant(User merchant);
 }

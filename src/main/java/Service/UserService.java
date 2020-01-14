@@ -23,6 +23,11 @@ public class UserService implements IUserService {
 
     @Override
     public boolean merchantExists(User merchant) {
+        for (User currentMerchant : database.getAllMerchants()) {
+            if (currentMerchant.equals(merchant));
+            return true;
+        }
+
         return false;
     }
 
@@ -37,7 +42,22 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String saveMerchant(User merchant) {
-        return null;
+    public String saveMerchant(User merchant) throws UserAlreadyExistsException {
+        if (merchantExists(merchant)) {
+            throw new UserAlreadyExistsException("This user already exists in the database.");
+        }
+
+        return this.database.saveMerchant(merchant);
+    }
+
+    @Override
+    public boolean deleteCustomer(User customer) {
+
+        return this.database.deleteCustomer(customer);
+    }
+
+    @Override
+    public boolean deleteMerchant(User merchant) {
+        return this.database.deleteMerchant(merchant);
     }
 }

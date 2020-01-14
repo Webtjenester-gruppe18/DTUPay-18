@@ -45,7 +45,7 @@ Feature: User management feature
     When the merchant tries to register
     Then the merchant has created a bank account with the credentials given
     When the merchant tries to register with the same credentials
-    Then the merchant will be rejected with the error message "only one account pr. merchant"
+    Then the merchant will be rejected with the error message "This user already exists in the database."
 
   Scenario: A merchant wants to delete account
     Given the merchant has an account
