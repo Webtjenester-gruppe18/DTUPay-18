@@ -77,7 +77,6 @@ public class CustomerReportSteps {
         assertEquals(1, this.customerTransactions.size());
     }
 
-
     @Given("the customer has performed atleast one transaction in the last month")
     public void theCustomerHasPerformedAtleastOneTransactionInTheLastMonth() {
 
