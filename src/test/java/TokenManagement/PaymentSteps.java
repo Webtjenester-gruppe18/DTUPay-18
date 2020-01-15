@@ -1,6 +1,8 @@
 package TokenManagement;
 import static org.junit.Assert.assertEquals;
 
+import Model.Customer;
+import Model.Merchant;
 import Service.IBankService;
 import Control.ControlReg;
 import Exception.*;
@@ -27,8 +29,8 @@ public class PaymentSteps {
     private IPaymentService paymentService;
     private String customerAccountNumber;
     private String merchantAccountNumber;
-    private User currentCustomer;
-    private User currentMerchant;
+    private Customer currentCustomer;
+    private Merchant currentMerchant;
     private Token currentToken;
 
     @Before
@@ -41,7 +43,7 @@ public class PaymentSteps {
 
     @Given("a customer is registered with an account balance {int}")
     public void theCustomerIsRegisteredWithAnAccountBalance(Integer balance) {
-        User customer = new User();
+        Customer customer = new Customer();
         customer.setCprNumber("999999-2200");
         customer.setFirstName("Jane");
         customer.setLastName("Doe");
@@ -67,7 +69,7 @@ public class PaymentSteps {
     @Given("the customer has at least {int} unused token")
     public void theCustomerHasAtLeastUnusedToken(Integer amountOfTokens) {
         try {
-            this.tokenManager.generateTokens(this.currentCustomer, amountOfTokens);
+            this.tokenManager.generateTokens(this.currentCustomer.getCprNumber(), amountOfTokens);
         } catch (TooManyTokensException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -77,7 +79,7 @@ public class PaymentSteps {
 
     @Given("a merchant that is registered with an account balance {int}")
     public void aMerchantThatIsRegisteredWithAnAccountBalance(Integer balance) {
-        User merchant = new User();
+        Merchant merchant = new Merchant();
         merchant.setCprNumber("112233-4455");
         merchant.setFirstName("John");
         merchant.setLastName("Doe");
@@ -150,7 +152,7 @@ public class PaymentSteps {
 
     @Given("a customer that is registered")
     public void aCustomerThatIsRegistered() {
-        User customer = new User();
+        Customer customer = new Customer();
         customer.setCprNumber("991199-2200");
         customer.setFirstName("Jane");
         customer.setLastName("Doe");

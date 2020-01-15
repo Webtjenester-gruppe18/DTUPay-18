@@ -15,15 +15,15 @@ public class TokenManager implements ITokenManager {
     private final int amountOfTokensToRequestForNewOnes = 1;
 
     @Override
-    public ArrayList<Token> getTokensByCpr(String cpr) {
-        return this.tokenDatabase.getTokensByCpr(cpr);
+    public ArrayList<Token> getTokensByCpr(String cprNumber) {
+        return this.tokenDatabase.getTokensByCpr(cprNumber);
     }
 
     @Override
-    public ArrayList<Token> getUnusedTokensByCpr(String cpr) {
+    public ArrayList<Token> getUnusedTokensByCpr(String cprNumber) {
         ArrayList<Token> result = new ArrayList<>();
 
-        for (Token token : this.getTokensByCpr(cpr)) {
+        for (Token token : this.getTokensByCpr(cprNumber)) {
             if (!token.isHasBeenUsed()) {
                 result.add(token);
             }
@@ -33,9 +33,9 @@ public class TokenManager implements ITokenManager {
     }
 
     @Override
-    public Token generateToken(User customer) {
+    public Token generateToken(String cprNumber) {
 
-        Token token = new Token(customer.getCprNumber());
+        Token token = new Token(cprNumber);
 
         this.tokenDatabase.saveToken(token);
 
@@ -43,42 +43,42 @@ public class TokenManager implements ITokenManager {
     }
 
     @Override
-    public ArrayList<Token> generateTokens(User customer, int amount) throws TooManyTokensException {
+    public ArrayList<Token> generateTokens(String cprNumber, int amount) throws TooManyTokensException {
         ArrayList<Token> result = new ArrayList<>();
 
-        if (getTokensByCpr(customer.getCprNumber()).size() > 1) {
+        if (getTokensByCpr(cprNumber).size() > 1) {
             throw new TooManyTokensException("The user has too many token to request for new ones.");
         }
 
         for (int i = 0; i < amount; i++) {
-            result.add(generateToken(customer));
+            result.add(generateToken(cprNumber));
         }
 
         return result;
     }
 
     @Override
-    public ArrayList<Token> requestForNewTokens(User customer) throws TooManyTokensException {
+    public ArrayList<Token> requestForNewTokens(String cprNumber) throws TooManyTokensException {
 
-        ArrayList<Token> userTokens = getTokensByCpr(customer.getCprNumber());
+        ArrayList<Token> userTokens = getTokensByCpr(cprNumber);
 
         if (userTokens.size() > amountOfTokensToRequestForNewOnes) {
             throw new TooManyTokensException("The user has too many token to request for new ones.");
         }
 
-        return generateTokens(customer, maxAmountOfTokens - userTokens.size());
+        return generateTokens(cprNumber, maxAmountOfTokens - userTokens.size());
     }
 
     @Override
-    public void clearUserTokens(String cpr) {
-        for (Token token : this.tokenDatabase.getTokensByCpr(cpr)) {
+    public void clearUserTokens(String cprNumber) {
+        for (Token token : this.tokenDatabase.getTokensByCpr(cprNumber)) {
             this.tokenDatabase.getAllTokens().remove(token);
         }
     }
 
     @Override
-    public Token validateToken(String userCpr, Token token) throws TokenValidationException {
-        if (isTokenFake(userCpr, token) || token.isHasBeenUsed()) {
+    public Token validateToken(String userCprNumber, Token token) throws TokenValidationException {
+        if (isTokenFake(userCprNumber, token) || token.isHasBeenUsed()) {
             throw new TokenValidationException("The token is not valid.");
         }
 
@@ -92,9 +92,9 @@ public class TokenManager implements ITokenManager {
         return token;
     }
 
-    public boolean isTokenFake(String userCpr, Token token) {
+    public boolean isTokenFake(String userCprNumber, Token token) {
 
-        ArrayList<Token> tokens = this.getTokensByCpr(userCpr);
+        ArrayList<Token> tokens = this.getTokensByCpr(userCprNumber);
 
         for (Token t : tokens) {
             if (t.getValue().equals(token.getValue())) {

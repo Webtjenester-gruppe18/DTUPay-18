@@ -1,6 +1,7 @@
 package Service;
 
 import Control.ControlReg;
+import Model.DTUPayUser;
 import Model.Token;
 import dtu.ws.fastmoney.*;
 import Exception.*;
@@ -12,8 +13,15 @@ public class BankService implements IBankService {
     private dtu.ws.fastmoney.BankService bank = ControlReg.getFastMoneyBankService();
 
     @Override
-    public String createAccountWithBalance(User user, BigDecimal initialBalance) throws BankServiceException_Exception {
-        return this.bank.createAccountWithBalance(user, initialBalance);
+    public String createAccountWithBalance(DTUPayUser user, BigDecimal initialBalance) throws BankServiceException_Exception {
+
+        User fastMoneyUser = new User();
+
+        fastMoneyUser.setCprNumber(user.getCprNumber());
+        fastMoneyUser.setFirstName(user.getFirstName());
+        fastMoneyUser.setLastName(user.getLastName());
+
+        return this.bank.createAccountWithBalance(fastMoneyUser, initialBalance);
     }
 
     @Override

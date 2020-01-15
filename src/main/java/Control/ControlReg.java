@@ -1,7 +1,9 @@
 package Control;
 import Bank.InMemoryBankService;
 import Database.ITokenDatabase;
+import Database.IUserDatabase;
 import Database.InMemoryTokenDatabase;
+import Database.InMomoryUserDatabase;
 import Exception.ExceptionContainer;
 import Service.*;
 import dtu.ws.fastmoney.BankServiceService;
@@ -13,7 +15,19 @@ public class ControlReg {
     private static ITokenManager tokenManager;
     private static dtu.ws.fastmoney.BankService bankService;
     private static IPaymentService paymentService;
+    private static IUserService userService;
+    private static IUserDatabase userDatabase;
     private static IReportingService reportingService;
+
+    public static IUserService getUserService() {
+        if (userService == null) userService = new UserService();
+        return userService;
+    }
+
+    public static IUserDatabase getUserDatabase() {
+        if (userDatabase == null) userDatabase = new InMomoryUserDatabase();
+        return userDatabase;
+     }
 
     public static IBankService getBankService() {
         if (bank == null) bank = new BankService();
