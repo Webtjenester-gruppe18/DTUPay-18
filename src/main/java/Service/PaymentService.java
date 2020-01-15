@@ -1,6 +1,7 @@
 package Service;
 
 import Control.ControlReg;
+import Model.CustomerReportTransaction;
 import Model.Token;
 import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankServiceException_Exception;
@@ -8,6 +9,7 @@ import dtu.ws.fastmoney.Transaction;
 import Exception.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class PaymentService implements IPaymentService {
 
@@ -22,6 +24,10 @@ public class PaymentService implements IPaymentService {
         if (isPaymentPossible(customerAccount, amount)) {
             this.bankService.transferMoneyFromTo(fromAccountNumber, toAccountNumber, amount, description, token);
             this.tokenManager.useToken(token);
+
+            CustomerReportTransaction customerReportTransaction = new CustomerReportTransaction(
+                    amount, new Date().getTime(), token, toAccountNumber
+            );
         }
     }
 
