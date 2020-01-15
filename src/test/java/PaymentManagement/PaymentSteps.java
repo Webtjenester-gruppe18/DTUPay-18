@@ -1,13 +1,11 @@
-package TokenManagement;
+package PaymentManagement;
 import static org.junit.Assert.assertEquals;
 
-import Model.Customer;
-import Model.Merchant;
+import Model.*;
 import Service.IBankService;
 import Control.ControlReg;
 import Exception.*;
 import Exception.TokenValidationException;
-import Model.Token;
 import Service.IPaymentService;
 import Service.ITokenManager;
 import dtu.ws.fastmoney.Account;
@@ -21,6 +19,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class PaymentSteps {
 
@@ -32,6 +31,7 @@ public class PaymentSteps {
     private Customer currentCustomer;
     private Merchant currentMerchant;
     private Token currentToken;
+    private CustomerReportTransaction customerReportTransaction;
 
     @Before
     public void setUp() {
@@ -199,6 +199,23 @@ public class PaymentSteps {
         } catch (NotEnoughMoneyException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
+    }
+
+    @Given("the customer has done one transaction")
+    public void theCustomerHasDoneOneTransaction() {
+        customerReportTransaction =
+                new CustomerReportTransaction(BigDecimal.valueOf(150), new Date().getTime(), new Token(), "Some value");
+    }
+
+    @When("the customer request the refund")
+    public void theCustomerRequestTheRefund() {
+
+    }
+
+    @Then("the money is transferred back to the customer account")
+    public void theMoneyIsTransferredBackToTheCustomerAccount() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new cucumber.api.PendingException();
     }
 
 

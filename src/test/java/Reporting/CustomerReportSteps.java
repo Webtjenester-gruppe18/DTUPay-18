@@ -1,6 +1,7 @@
 package Reporting;
 
 import Control.ControlReg;
+import Model.Customer;
 import Service.IBankService;
 import Service.IReportingService;
 import dtu.ws.fastmoney.Account;
@@ -20,7 +21,7 @@ public class CustomerReportSteps {
 
     private IBankService bankService;
     private IReportingService reportingService;
-    private User currentCustomer;
+    private Customer currentCustomer;
     private String accountId;
     private List<Transaction> customerTransactions;
 
@@ -33,7 +34,7 @@ public class CustomerReportSteps {
 
     @Given("a registered customer with an account")
     public void aRegisteredCustomerWithAnAccount() {
-        this.currentCustomer = new User();
+        this.currentCustomer = new Customer();
         this.currentCustomer.setCprNumber("888888-2222");
         this.currentCustomer.setFirstName("Jane");
         this.currentCustomer.setLastName("Doe");
