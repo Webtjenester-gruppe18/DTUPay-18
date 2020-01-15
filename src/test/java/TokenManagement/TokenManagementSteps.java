@@ -39,7 +39,7 @@ public class TokenManagementSteps {
     @Given("the customer has no more than {int} unused token left")
     public void theCustomerHasNotMoreThanUnusedTokenLeft(Integer tokensLeft) {
         try {
-            this.tokenManager.generateTokens(this.currentCustomer, tokensLeft);
+            this.tokenManager.generateTokens(this.currentCustomer.getCprNumber(), tokensLeft);
         } catch (TooManyTokensException e) {
             System.out.println("1 " + e.getMessage());
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
@@ -49,7 +49,7 @@ public class TokenManagementSteps {
     @When("the customer requests more tokens")
     public void theCustomerRequestsMoreTokens() {
         try {
-            this.tokensReceived = this.tokenManager.requestForNewTokens(this.currentCustomer);
+            this.tokensReceived = this.tokenManager.requestForNewTokens(this.currentCustomer.getCprNumber());
         } catch (TooManyTokensException e) {
             System.out.println("2 " + e.getMessage());
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
@@ -69,7 +69,7 @@ public class TokenManagementSteps {
     @Given("the customer has atleast {int} unused token left")
     public void theCustomerHasAtleastUnusedTokenLeft(Integer amountOfTokens) {
         try {
-            this.tokenManager.requestForNewTokens(this.currentCustomer);
+            this.tokenManager.requestForNewTokens(this.currentCustomer.getCprNumber());
         } catch (TooManyTokensException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
