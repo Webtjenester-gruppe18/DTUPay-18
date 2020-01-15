@@ -1,5 +1,7 @@
 package Database;
 
+import Model.Customer;
+import Model.Merchant;
 import dtu.ws.fastmoney.User;
 import io.cucumber.java.bs.A;
 
@@ -8,14 +10,14 @@ import Exception.UserNotFoundException;
 
 public class InMomoryUserDatabase implements IUserDatabase {
 
-    private ArrayList<User> customers = new ArrayList<>();
-    private ArrayList<User> merchants = new ArrayList<>();
+    private ArrayList<Customer> customers = new ArrayList<>();
+    private ArrayList<Merchant> merchants = new ArrayList<>();
 
 
     @Override
-    public User getCustomer(String cprNumber) throws UserNotFoundException {
+    public Customer getCustomer(String cprNumber) throws UserNotFoundException {
 
-        for (User currentCustomer : this.customers) {
+        for (Customer currentCustomer : this.customers) {
             if (currentCustomer.getCprNumber().equals(cprNumber)) {
                 return currentCustomer;
             }
@@ -24,9 +26,9 @@ public class InMomoryUserDatabase implements IUserDatabase {
     }
 
     @Override
-    public User getMerchant(String cprNumber) throws UserNotFoundException {
+    public Merchant getMerchant(String cprNumber) throws UserNotFoundException {
 
-        for (User currentMerchant : this.customers) {
+        for (Merchant currentMerchant : this.merchants) {
             if (currentMerchant.getCprNumber().equals(cprNumber)){
                 return currentMerchant;
             }
@@ -35,17 +37,17 @@ public class InMomoryUserDatabase implements IUserDatabase {
     }
 
     @Override
-    public ArrayList<User> getAllCustomers() {
+    public ArrayList<Customer> getAllCustomers() {
         return this.customers;
     }
 
     @Override
-    public ArrayList<User> getAllMerchants() {
+    public ArrayList<Merchant> getAllMerchants() {
         return this.merchants;
     }
 
     @Override
-    public String saveCustomer(User customer) {
+    public String saveCustomer(Customer customer) {
 
         this.customers.add(customer);
 
@@ -53,7 +55,7 @@ public class InMomoryUserDatabase implements IUserDatabase {
     }
 
     @Override
-    public String saveMerchant(User merchant) {
+    public String saveMerchant(Merchant merchant) {
 
         this.merchants.add(merchant);
 
@@ -61,7 +63,7 @@ public class InMomoryUserDatabase implements IUserDatabase {
     }
 
     @Override
-    public boolean deleteCustomer(User customer) {
+    public boolean deleteCustomer(Customer customer) {
 
         this.customers.remove(customer);
 
@@ -69,7 +71,7 @@ public class InMomoryUserDatabase implements IUserDatabase {
     }
 
     @Override
-    public boolean deleteMerchant(User merchant) {
+    public boolean deleteMerchant(Merchant merchant) {
 
         this.merchants.remove(merchant);
 

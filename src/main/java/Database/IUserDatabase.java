@@ -1,5 +1,7 @@
 package Database;
 import Exception.UserNotFoundException;
+import Model.Customer;
+import Model.Merchant;
 import dtu.ws.fastmoney.User;
 
 import java.util.ArrayList;
@@ -7,19 +9,19 @@ import java.util.ArrayList;
 public interface IUserDatabase {
 
 
-    User getCustomer(String cprNumber) throws UserNotFoundException;
+    Customer getCustomer(String cprNumber) throws UserNotFoundException;
 
-    User getMerchant(String cprNumber) throws UserNotFoundException;
+    Merchant getMerchant(String cprNumber) throws UserNotFoundException;
 
-    ArrayList<User> getAllCustomers();
+    ArrayList<Customer> getAllCustomers();
 
-    ArrayList<User> getAllMerchants();
+    ArrayList<Merchant> getAllMerchants();
 
-    String saveCustomer(User customer);
+    String saveCustomer(Customer customer);
 
-    String saveMerchant(User merchant);
+    String saveMerchant(Merchant merchant);
 
-    boolean deleteCustomer(User customer);
+    boolean deleteCustomer(Customer customer);
 
-    boolean deleteMerchant(User merchant);
+    boolean deleteMerchant(Merchant merchant);
 }

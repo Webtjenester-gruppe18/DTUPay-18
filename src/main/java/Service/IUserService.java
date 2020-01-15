@@ -1,19 +1,21 @@
 package Service;
 import Exception.UserAlreadyExistsException;
 import Database.IUserDatabase;
+import Model.Customer;
+import Model.Merchant;
 import dtu.ws.fastmoney.User;
 
 public interface IUserService {
 
-    boolean customerExists(User customer);
+    boolean customerExists(Customer customer);
 
-    boolean merchantExists(User merchant);
+    boolean merchantExists(Merchant merchant);
 
-    String saveCustomer(User customer) throws UserAlreadyExistsException;
+    String registerCustomer(Customer customer) throws UserAlreadyExistsException;
 
-    String saveMerchant(User merchant) throws UserAlreadyExistsException;
+    String registerMerchant(Merchant merchant) throws UserAlreadyExistsException;
 
-    boolean deleteCustomer(User customer);
+    boolean deleteCustomer(Customer customer);
 
-    boolean deleteMerchant(User merchant);
+    boolean deleteMerchant(Merchant merchant);
 }

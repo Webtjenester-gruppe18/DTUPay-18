@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
+import Model.Customer;
+import Model.Merchant;
 import Service.*;
 import Control.ControlReg;
 import Exception.*;
@@ -17,14 +19,14 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Assert;
 
 
 import java.math.BigDecimal;
 
 public class UserManagementSteps {
 
-    private User currentUser;
+    private Customer currentCustomer;
+    private Merchant currentMerchant;
     private IUserService userService;
     private IBankService bankService;
     private String currentAccountId;
@@ -39,31 +41,31 @@ public class UserManagementSteps {
     public void a_customer_is_not_already_registered() {
         // Write code here that turns the phrase above into concrete actions
 
-        this.currentUser = new User();
+        this.currentCustomer = new Customer();
 
     }
 
-    @Given("with first name is {string}")
+    @Given("the customers first name is {string}")
     public void with_first_name_is(String firstName) {
         // Write code here that turns the phrase above into concrete actions
 
-        this.currentUser.setFirstName(firstName);
+        this.currentCustomer.setFirstName(firstName);
 
     }
 
-    @Given("with last name is {string}")
+    @Given("the customers last name is {string}")
     public void with_last_name_is(String lastName) {
         // Write code here that turns the phrase above into concrete actions
 
-        this.currentUser.setLastName(lastName);
+        this.currentCustomer.setLastName(lastName);
 
     }
 
-    @Given("with CPR number {string}")
+    @Given("the customers CPR number {string}")
     public void with_CPR_number(String cprNumber) {
         // Write code here that turns the phrase above into concrete actions
 
-        this.currentUser.setCprNumber(cprNumber);
+        this.currentCustomer.setCprNumber(cprNumber);
 
     }
 
@@ -71,10 +73,10 @@ public class UserManagementSteps {
     public void the_customer_registers() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertFalse(userService.customerExists(this.currentUser));
+        assertFalse(userService.customerExists(this.currentCustomer));
 
         try {
-            this.userService.saveCustomer(this.currentUser);
+            this.userService.registerCustomer(this.currentCustomer);
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -83,7 +85,7 @@ public class UserManagementSteps {
     @Then("the account is created and registered")
     public void the_account_is_created_and_registered() {
         // Write code here that turns the phrase above into concrete actions
-        assertTrue(userService.customerExists(this.currentUser));
+        assertTrue(userService.customerExists(this.currentCustomer));
     }
 
     @When("the customer tries to register with the same credentials")
@@ -91,7 +93,7 @@ public class UserManagementSteps {
         // Write code here that turns the phrase above into concrete actions
 
         try {
-            this.userService.saveCustomer(this.currentUser);
+            this.userService.registerCustomer(this.currentCustomer);
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -106,93 +108,65 @@ public class UserManagementSteps {
     @Given("a customer has an account")
     public void a_customer_has_an_account() {
         // Write code here that turns the phrase above into concrete actions
-        this.currentUser = new User();
+        this.currentCustomer = new Customer();
 
-        this.currentUser.setFirstName("John");
-        this.currentUser.setLastName("Doe");
-        this.currentUser.setCprNumber("12345678");
+        this.currentCustomer.setFirstName("John");
+        this.currentCustomer.setLastName("Doe");
+        this.currentCustomer.setCprNumber("12345678");
 
         try {
-            this.userService.saveCustomer(this.currentUser);
+            this.userService.registerCustomer(this.currentCustomer);
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
-        assertTrue(userService.customerExists(this.currentUser));
+        assertTrue(userService.customerExists(this.currentCustomer));
     }
 
     @When("the customer requests to delete the account")
     public void the_customer_requests_to_delete_the_account() {
         // Write code here that turns the phrase above into concrete actions
-        this.userService.deleteCustomer(this.currentUser);
+        this.userService.deleteCustomer(this.currentCustomer);
     }
 
     @Then("the customer account is deleted")
     public void theCustomerAccountIsDeleted() {
         // Write code here that turns the phrase above into concrete actions
-        assertFalse(userService.customerExists(this.currentUser));
-    }
-
-    @Given("a customer that has an account with balance of {int} kr")
-    public void a_customer_that_has_an_account_with_balance_of_kr(Integer balance) {
-        // Write code here that turns the phrase above into concrete actions
-
-        this.currentUser = new User();
-
-        this.currentUser.setFirstName("John");
-        this.currentUser.setLastName("Doe");
-        this.currentUser.setCprNumber("12345678");
-
-        try {
-            this.currentAccountId = this.bankService.createAccountWithBalance(this.currentUser, BigDecimal.valueOf(balance));
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-        Account customerAccount = null;
-        try {
-            customerAccount = this.bankService.getAccount(this.currentAccountId);
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
-    }
-
-    @When("the customer adds {int} kr to the account")
-    public void the_customer_adds_kr_to_the_account(Integer amount) {
-        // Write code here that turns the phrase above into concrete actions
-
-    }
-
-    @Then("the money will be added to the account")
-    public void the_money_will_be_added_to_the_account() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
-    }
-
-    @Then("the account balance is {int} kr")
-    public void the_account_balance_is_kr(Integer int1) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new cucumber.api.PendingException();
+        assertFalse(userService.customerExists(this.currentCustomer));
     }
 
     @Given("a merchant that is not already registered")
     public void a_merchant_that_is_not_already_registered() {
         // Write code here that turns the phrase above into concrete actions
 
-        this.currentUser = new User();
+        this.currentMerchant = new Merchant();
+    }
+
+    @Given("the merchants first name is {string}")
+    public void theMerchantsFirstNameIs(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        this.currentMerchant.setFirstName("Mikkel");
+    }
+
+    @Given("the merchants last name is {string}")
+    public void theMerchantsLastNameIs(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        this.currentMerchant.setLastName("Hansen");
+    }
+
+    @Given("the merchants CPR number {string}")
+    public void theMerchantsCPRNumber(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        this.currentMerchant.setCprNumber("87654321");
     }
 
     @When("the merchant tries to register")
     public void the_merchant_tries_to_register() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertFalse(userService.customerExists(this.currentUser));
-
-        this.currentUser.setFirstName("Mikkel");
-        this.currentUser.setLastName("Hansen");
-        this.currentUser.setCprNumber("87654321");
+        assertFalse(userService.merchantExists(this.currentMerchant));
 
         try {
-            this.userService.saveMerchant(this.currentUser);
+            this.userService.registerMerchant(this.currentMerchant);
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -202,14 +176,14 @@ public class UserManagementSteps {
     public void the_merchant_has_created_a_bank_account_with_the_credentials_given() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertTrue(userService.merchantExists(this.currentUser));
+        assertTrue(userService.merchantExists(this.currentMerchant));
     }
 
     @When("the merchant tries to register with the same credentials")
     public void the_merchant_tries_to_register_with_the_same_credentials() {
         // Write code here that turns the phrase above into concrete actions
         try {
-            this.userService.saveMerchant(this.currentUser);
+            this.userService.registerMerchant(this.currentMerchant);
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
@@ -225,31 +199,32 @@ public class UserManagementSteps {
     public void the_merchant_has_an_account() {
         // Write code here that turns the phrase above into concrete actions
 
-        this.currentUser = new User();
+        this.currentMerchant = new Merchant();
 
-        this.currentUser.setFirstName("Mikkel");
-        this.currentUser.setLastName("Hansen");
-        this.currentUser.setCprNumber("87654321");
+        this.currentMerchant.setFirstName("Mikkel");
+        this.currentMerchant.setLastName("Hansen");
+        this.currentMerchant.setCprNumber("87654321");
+        this.currentMerchant.setAccountId("000000000");
 
         try {
-            this.userService.saveMerchant(this.currentUser);
+            this.userService.registerMerchant(this.currentMerchant);
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
-        assertTrue(userService.merchantExists(this.currentUser));
+        assertTrue(userService.merchantExists(this.currentMerchant));
     }
 
     @When("the merchant requests to delete the account")
     public void the_merchant_requests_to_delete_the_account() {
         // Write code here that turns the phrase above into concrete actions
-        this.userService.deleteMerchant(this.currentUser);
+        this.userService.deleteMerchant(this.currentMerchant);
     }
 
     @Then("the merchant account is deleted")
     public void theMerchantAccountIsDeleted() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertFalse(userService.merchantExists(this.currentUser));
+        assertFalse(userService.merchantExists(this.currentMerchant));
     }
 
 
@@ -264,8 +239,8 @@ public class UserManagementSteps {
 //            this.bankService.retireAccount(this.merchantAccountNumber);
 //        }
 
-        if (this.currentUser != null) {
-            this.userService.deleteCustomer(currentUser);
+        if (this.currentCustomer != null) {
+            this.userService.deleteCustomer(currentCustomer);
         }
     }
 

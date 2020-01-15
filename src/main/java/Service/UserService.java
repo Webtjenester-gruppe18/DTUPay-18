@@ -2,6 +2,8 @@ package Service;
 import Exception.UserAlreadyExistsException;
 import Control.ControlReg;
 import Database.IUserDatabase;
+import Model.Customer;
+import Model.Merchant;
 import dtu.ws.fastmoney.User;
 
 public class UserService implements IUserService {
@@ -9,9 +11,9 @@ public class UserService implements IUserService {
     IUserDatabase database = ControlReg.getUserDatabase();
     
     @Override
-    public boolean customerExists(User customer) {
+    public boolean customerExists(Customer customer) {
 
-        for (User currentCustomer : database.getAllCustomers()) {
+        for (Customer currentCustomer : database.getAllCustomers()) {
             if (currentCustomer.equals(customer)) {
                 return true;
             }
@@ -22,8 +24,8 @@ public class UserService implements IUserService {
 
 
     @Override
-    public boolean merchantExists(User merchant) {
-        for (User currentMerchant : database.getAllMerchants()) {
+    public boolean merchantExists(Merchant merchant) {
+        for (Merchant currentMerchant : database.getAllMerchants()) {
             if (currentMerchant.equals(merchant)){
                 return true;
             }
@@ -33,7 +35,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String saveCustomer(User customer) throws UserAlreadyExistsException {
+    public String registerCustomer(Customer customer) throws UserAlreadyExistsException {
 
         if (customerExists(customer)){
             throw new UserAlreadyExistsException("This user already exists in the database.");
@@ -43,7 +45,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String saveMerchant(User merchant) throws UserAlreadyExistsException {
+    public String registerMerchant(Merchant merchant) throws UserAlreadyExistsException {
         if (merchantExists(merchant)) {
             throw new UserAlreadyExistsException("This user already exists in the database.");
         }
@@ -52,13 +54,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean deleteCustomer(User customer) {
+    public boolean deleteCustomer(Customer customer) {
 
         return this.database.deleteCustomer(customer);
     }
 
     @Override
-    public boolean deleteMerchant(User merchant) {
+    public boolean deleteMerchant(Merchant merchant) {
         return this.database.deleteMerchant(merchant);
     }
 }
