@@ -2,18 +2,16 @@ package Model;
 
 import dtu.ws.fastmoney.Transaction;
 
+import java.math.BigDecimal;
+
 public class CustomerReportTransaction extends ReportTransaction {
 
     private String merchantAccountId;
 
-    public CustomerReportTransaction(Transaction transaction, String customerCpr) {
-        super(transaction);
+    public CustomerReportTransaction(BigDecimal amount, long dateTime, Token tokenUsed, String merchantAccountId) {
+        super(amount, dateTime, tokenUsed);
 
-        if (transaction.getCreditor().equals(customerCpr)) {
-            this.merchantAccountId = transaction.getDebtor();
-        } else {
-            this.merchantAccountId = transaction.getCreditor();
-        }
+        this.merchantAccountId = merchantAccountId;
     }
 
     public String getMerchantAccountId() {

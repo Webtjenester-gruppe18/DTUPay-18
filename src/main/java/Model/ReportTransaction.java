@@ -4,17 +4,18 @@ import dtu.ws.fastmoney.Transaction;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
+import java.util.Date;
 
 public abstract class ReportTransaction {
 
     private BigDecimal amount;
-    private XMLGregorianCalendar time;
+    private long dateTime;
     private Token tokenUsed;
 
-    public ReportTransaction(Transaction transaction) {
-        this.amount = transaction.getAmount();
-        this.time = transaction.getTime();
-        this.tokenUsed = new Token();
+    public ReportTransaction(BigDecimal amount, long dateTime, Token tokenUsed) {
+        this.amount = amount;
+        this.dateTime = dateTime;
+        this.tokenUsed = tokenUsed;
     }
 
     public BigDecimal getAmount() {
@@ -25,12 +26,12 @@ public abstract class ReportTransaction {
         this.amount = amount;
     }
 
-    public XMLGregorianCalendar getTime() {
-        return time;
+    public long getDateTime() {
+        return dateTime;
     }
 
-    public void setTime(XMLGregorianCalendar time) {
-        this.time = time;
+    public void setDateTime(long dateTime) {
+        this.dateTime = dateTime;
     }
 
     public Token getTokenUsed() {
