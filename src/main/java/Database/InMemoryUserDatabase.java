@@ -1,6 +1,7 @@
 package Database;
 
 import Model.Customer;
+import Model.DTUPayUser;
 import Model.Merchant;
 import dtu.ws.fastmoney.User;
 import io.cucumber.java.bs.A;
@@ -8,7 +9,7 @@ import io.cucumber.java.bs.A;
 import java.util.ArrayList;
 import Exception.UserNotFoundException;
 
-public class InMomoryUserDatabase implements IUserDatabase {
+public class InMemoryUserDatabase implements IUserDatabase {
 
     private ArrayList<Customer> customers = new ArrayList<>();
     private ArrayList<Merchant> merchants = new ArrayList<>();
@@ -76,5 +77,29 @@ public class InMomoryUserDatabase implements IUserDatabase {
         this.merchants.remove(merchant);
 
         return true;
+    }
+
+    @Override
+    public DTUPayUser getDTUPayUserByAccountId(String accountId) {
+
+        for (DTUPayUser customer : this.customers) {
+            if (customer.getAccountId().equals(accountId)) {
+                return customer;
+            }
+        }
+
+        for (DTUPayUser merchant : this.merchants) {
+            if (merchant.getAccountId().equals(accountId)) {
+                return merchant;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public void addTransactionToUserByAccountId(String accountId, String transactionId) {
+        DTUPayUser user =  this.getDTUPayUserByAccountId(accountId);
+        user.getTransactionIds().add(transactionId);
     }
 }

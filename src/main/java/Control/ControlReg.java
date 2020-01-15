@@ -1,12 +1,8 @@
 package Control;
 import Bank.InMemoryBankService;
-import Database.ITokenDatabase;
-import Database.IUserDatabase;
-import Database.InMemoryTokenDatabase;
-import Database.InMomoryUserDatabase;
+import Database.*;
 import Exception.ExceptionContainer;
 import Service.*;
-import dtu.ws.fastmoney.BankServiceService;
 
 public class ControlReg {
     private static ExceptionContainer exceptionContainer;
@@ -18,6 +14,7 @@ public class ControlReg {
     private static IUserService userService;
     private static IUserDatabase userDatabase;
     private static IReportingService reportingService;
+    private static IReportDatabase reportDatabase;
 
     public static IUserService getUserService() {
         if (userService == null) userService = new UserService();
@@ -25,7 +22,7 @@ public class ControlReg {
     }
 
     public static IUserDatabase getUserDatabase() {
-        if (userDatabase == null) userDatabase = new InMomoryUserDatabase();
+        if (userDatabase == null) userDatabase = new InMemoryUserDatabase();
         return userDatabase;
      }
 
@@ -63,5 +60,10 @@ public class ControlReg {
     public static IReportingService getReportingService() {
         if (reportingService == null) reportingService = new ReportingService();
         return reportingService;
+    }
+
+    public static IReportDatabase getReportDatabase() {
+        if (reportDatabase == null) reportDatabase = new InMemoryReportDatabase();
+        return reportDatabase;
     }
 }

@@ -40,7 +40,7 @@ public class BankService implements IBankService {
     }
 
     @Override
-    public void transferMoneyFromTo(String fromAccountNumber, String toAccountNumber, BigDecimal amount, String description, Token token) throws BankServiceException_Exception {
+    public void transferMoneyFromTo(String fromAccountNumber, String toAccountNumber, BigDecimal amount, String description) throws BankServiceException_Exception {
         this.bank.transferMoneyFromTo(fromAccountNumber, toAccountNumber, amount, description);
     }
 }

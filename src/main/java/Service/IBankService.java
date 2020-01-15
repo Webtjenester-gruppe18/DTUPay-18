@@ -15,5 +15,5 @@ public interface IBankService {
     Account getAccount(String accountNumber) throws BankServiceException_Exception;
     Account getAccountByCpr(String cpr) throws BankServiceException_Exception;
     void retireAccount(String accountNumber) throws BankServiceException_Exception;
-    void transferMoneyFromTo(String fromAccountNumber, String toAccountNumber, BigDecimal amount, String description, Token token) throws BankServiceException_Exception, TokenValidationException;
+    void transferMoneyFromTo(String fromAccountNumber, String toAccountNumber, BigDecimal amount, String description) throws BankServiceException_Exception;
 }

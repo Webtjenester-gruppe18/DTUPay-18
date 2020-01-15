@@ -1,8 +1,13 @@
 package Reporting;
 
 import Control.ControlReg;
+import Model.Customer;
+import Model.CustomerReportTransaction;
+import Model.DTUPayTransaction;
+import Model.Token;
 import Service.IBankService;
 import Service.IReportingService;
+import Utillity.Utillity;
 import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import dtu.ws.fastmoney.Transaction;
@@ -12,6 +17,8 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -20,9 +27,9 @@ public class CustomerReportSteps {
 
     private IBankService bankService;
     private IReportingService reportingService;
-    private User currentCustomer;
+    private Customer currentCustomer;
     private String accountId;
-    private List<Transaction> customerTransactions;
+    private ArrayList<CustomerReportTransaction> customerTransactions;
 
 
     @Before
@@ -33,54 +40,66 @@ public class CustomerReportSteps {
 
     @Given("a registered customer with an account")
     public void aRegisteredCustomerWithAnAccount() {
-        this.currentCustomer = new User();
+        this.currentCustomer = new Customer();
         this.currentCustomer.setCprNumber("888888-2222");
         this.currentCustomer.setFirstName("Jane");
         this.currentCustomer.setLastName("Doe");
-
-        try {
-            this.accountId = this.bankService.createAccountWithBalance(this.currentCustomer, BigDecimal.valueOf(500));
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-
-        Account customerAccount = null;
-        try {
-            customerAccount = this.bankService.getAccount(this.accountId);
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
-
-        assertEquals(customerAccount.getBalance(), BigDecimal.valueOf(500));
+        this.currentCustomer.setAccountId("Some value for testing");
+        this.currentCustomer.setTransactionIds(new ArrayList<>());
     }
 
     @Given("the customer has performed atleast one transaction")
     public void theCustomerHasPerformedAtleastOneTransaction() {
-        Account customerAccount = null;
-        try {
-            customerAccount = this.bankService.getAccount(this.accountId);
-        } catch (BankServiceException_Exception e) {
-            e.printStackTrace();
-        }
 
-        Transaction transaction = new Transaction();
-        customerAccount.getTransactions().add(transaction);
+        DTUPayTransaction transaction =
+                new DTUPayTransaction(
+                        BigDecimal.valueOf(1111),
+                        this.currentCustomer.getAccountId(),
+                        "Some Value",
+                        "Comment",
+                        new Date().getTime(),
+                        new Token());
 
-        assertEquals(1, customerAccount.getTransactions().size());
+        String transactionId = this.reportingService.saveTransaction(transaction);
+
+        this.currentCustomer.getTransactionIds().add(transactionId);
+
+        assertEquals(1, this.currentCustomer.getTransactionIds().size());
     }
 
     @When("the customer requests for an overview")
     public void theCustomerRequestsForAnOverview() {
-        try {
-            this.customerTransactions = this.reportingService.getTransactionsByCpr(this.currentCustomer.getCprNumber());
-        } catch (BankServiceException_Exception e) {
-            ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
-        }
+        this.customerTransactions = this.reportingService.getCustomerTransactionsByIds(this.currentCustomer);
     }
 
     @Then("an overview is create with one transaction")
     public void anOverviewIsCreateWithOneTransaction() {
         assertEquals(1, this.customerTransactions.size());
+    }
+
+
+    @Given("the customer has performed atleast one transaction in the last month")
+    public void theCustomerHasPerformedAtleastOneTransactionInTheLastMonth() {
+
+        DTUPayTransaction transaction =
+                new DTUPayTransaction(
+                        BigDecimal.valueOf(1111),
+                        this.currentCustomer.getAccountId(),
+                        "Some Value",
+                        "Comment",
+                        new Date().getTime(),
+                        new Token());
+
+        String transactionId = this.reportingService.saveTransaction(transaction);
+
+        this.currentCustomer.getTransactionIds().add(transactionId);
+
+        assertEquals(1, this.currentCustomer.getTransactionIds().size());
+    }
+
+    @When("the customer requests for an monthly overview")
+    public void theCustomerRequestsForAnMonthlyOverview() {
+        this.customerTransactions = this.reportingService.getCustomerTransactionsByIdsFromThenToNow(this.currentCustomer, Utillity.MONTH_IN_MILLIS);
     }
 
     @After

@@ -63,4 +63,19 @@ public class UserService implements IUserService {
     public boolean deleteMerchant(Merchant merchant) {
         return this.database.deleteMerchant(merchant);
     }
+
+    @Override
+    public Customer getCustomerByAccountId(String accountId) {
+        return null;
+    }
+
+    @Override
+    public Merchant getMerchantByAccountId(String accountId) {
+        return null;
+    }
+
+    @Override
+    public void addTransactionToUserByAccountId(String accountId, String transactionId) {
+        this.database.addTransactionToUserByAccountId(accountId, transactionId);
+    }
 }

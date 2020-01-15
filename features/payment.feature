@@ -32,7 +32,9 @@ Feature: Make payment
 
   Scenario: Customer wants to refund a transaction
     Given a customer is registered with an account balance 200
-    And the customer has done one transaction
-    When the customer request the refund
+    And the customer has at least 1 unused token
+    And a merchant that is registered with an account balance 1000
+    And the customer has done a transaction with the merchant
+    When the customer requests to refund the transaction
     Then the money is transferred back to the customer account
 

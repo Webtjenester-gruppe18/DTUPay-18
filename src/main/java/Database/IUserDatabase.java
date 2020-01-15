@@ -1,6 +1,8 @@
 package Database;
 import Exception.UserNotFoundException;
 import Model.Customer;
+import Model.DTUPayTransaction;
+import Model.DTUPayUser;
 import Model.Merchant;
 import dtu.ws.fastmoney.User;
 
@@ -24,4 +26,8 @@ public interface IUserDatabase {
     boolean deleteCustomer(Customer customer);
 
     boolean deleteMerchant(Merchant merchant);
+
+    DTUPayUser getDTUPayUserByAccountId(String accountId);
+
+    void addTransactionToUserByAccountId(String accountId, String transactionId);
 }

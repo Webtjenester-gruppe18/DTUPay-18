@@ -9,36 +9,30 @@ import java.util.Date;
 public abstract class ReportTransaction {
 
     private BigDecimal amount;
-    private long dateTime;
-    private Token tokenUsed;
+    private String description;
+    private long time;
+    private Token token;
 
-    public ReportTransaction(BigDecimal amount, long dateTime, Token tokenUsed) {
+    public ReportTransaction(BigDecimal amount, String description, long time, Token token) {
         this.amount = amount;
-        this.dateTime = dateTime;
-        this.tokenUsed = tokenUsed;
+        this.description = description;
+        this.time = time;
+        this.token = token;
     }
 
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public String getDescription() {
+        return description;
     }
 
-    public long getDateTime() {
-        return dateTime;
+    public long getTime() {
+        return time;
     }
 
-    public void setDateTime(long dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public Token getTokenUsed() {
-        return tokenUsed;
-    }
-
-    public void setTokenUsed(Token tokenUsed) {
-        this.tokenUsed = tokenUsed;
+    public Token getToken() {
+        return token;
     }
 }
