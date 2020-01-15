@@ -1,6 +1,5 @@
 package TokenManagement;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import Model.Customer;
 import Model.Merchant;
@@ -20,6 +19,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import java.math.BigDecimal;
 
 public class PaymentSteps {
@@ -63,7 +63,7 @@ public class PaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
+        assertEquals(customerAccount.getBalance(), BigDecimal.valueOf(balance));
     }
 
     @Given("the customer has at least {int} unused token")
@@ -74,7 +74,7 @@ public class PaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size(), is(equalTo(amountOfTokens)));
+        assertEquals(Integer.valueOf(this.tokenManager.getTokensByCpr(this.currentCustomer.getCprNumber()).size()), amountOfTokens);
     }
 
     @Given("a merchant that is registered with an account balance {int}")
@@ -92,14 +92,14 @@ public class PaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        Account customerAccount = null;
+        Account merchantAccount = null;
         try {
-            customerAccount = this.bankService.getAccount(this.merchantAccountNumber);
+            merchantAccount = this.bankService.getAccount(this.merchantAccountNumber);
         } catch (BankServiceException_Exception e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(balance))));
+        assertEquals(merchantAccount.getBalance(), BigDecimal.valueOf(balance));
     }
 
     @When("the customer pays the merchant {int} kr")
@@ -131,7 +131,7 @@ public class PaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(customerAccount.getBalance(), is(equalTo(BigDecimal.valueOf(customerAccountBalance))));
+        assertEquals(customerAccount.getBalance(), BigDecimal.valueOf(customerAccountBalance));
     }
 
     @Then("the merchant account balance is {int} kr")
@@ -143,7 +143,7 @@ public class PaymentSteps {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
 
-        assertThat(merchantAccount.getBalance(), is(equalTo(BigDecimal.valueOf(merchantAccountBalance))));
+        assertEquals(merchantAccount.getBalance(), BigDecimal.valueOf(merchantAccountBalance));
     }
 
     //
@@ -176,7 +176,7 @@ public class PaymentSteps {
 
     @Then("the payment is rejected with the error message {string}")
     public void thePaymentIsRejectedWithTheErrorMessage(String errorMessage) {
-        assertThat(ControlReg.getExceptionContainer().getErrorMessage(), is(equalTo(errorMessage)));
+        assertEquals(ControlReg.getExceptionContainer().getErrorMessage(), errorMessage);
     }
 
     //
