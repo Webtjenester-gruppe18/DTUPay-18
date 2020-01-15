@@ -1,13 +1,13 @@
 package UserManagement;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 import Service.*;
 import Control.ControlReg;
 import Exception.*;
-import Exception.TokenValidationException;
-import Model.Token;
 import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import dtu.ws.fastmoney.User;
@@ -17,6 +17,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.Assert;
 
 
 import java.math.BigDecimal;
@@ -70,7 +71,7 @@ public class UserManagementSteps {
     public void the_customer_registers() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertThat(userService.customerExists(this.currentUser), equalTo(false));
+        assertFalse(userService.customerExists(this.currentUser));
 
         try {
             this.userService.saveCustomer(this.currentUser);
@@ -82,7 +83,7 @@ public class UserManagementSteps {
     @Then("the account is created and registered")
     public void the_account_is_created_and_registered() {
         // Write code here that turns the phrase above into concrete actions
-        assertThat(userService.customerExists(this.currentUser), equalTo(true));
+        assertTrue(userService.customerExists(this.currentUser));
     }
 
     @When("the customer tries to register with the same credentials")
@@ -116,7 +117,7 @@ public class UserManagementSteps {
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
-        assertThat(userService.customerExists(this.currentUser), equalTo(true));
+        assertTrue(userService.customerExists(this.currentUser));
     }
 
     @When("the customer requests to delete the account")
@@ -125,11 +126,10 @@ public class UserManagementSteps {
         this.userService.deleteCustomer(this.currentUser);
     }
 
-    @Then("the account will be deleted")
-    public void the_account_will_be_deleted() {
+    @Then("the customer account is deleted")
+    public void theCustomerAccountIsDeleted() {
         // Write code here that turns the phrase above into concrete actions
-
-        assertThat(userService.customerExists(this.currentUser), equalTo(false));
+        assertFalse(userService.customerExists(this.currentUser));
     }
 
     @Given("a customer that has an account with balance of {int} kr")
@@ -185,7 +185,7 @@ public class UserManagementSteps {
     public void the_merchant_tries_to_register() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertThat(userService.customerExists(this.currentUser), equalTo(false));
+        assertFalse(userService.customerExists(this.currentUser));
 
         this.currentUser.setFirstName("Mikkel");
         this.currentUser.setLastName("Hansen");
@@ -202,7 +202,7 @@ public class UserManagementSteps {
     public void the_merchant_has_created_a_bank_account_with_the_credentials_given() {
         // Write code here that turns the phrase above into concrete actions
 
-        assertThat(userService.merchantExists(currentUser), equalTo(true));
+        assertTrue(userService.merchantExists(this.currentUser));
     }
 
     @When("the merchant tries to register with the same credentials")
@@ -236,7 +236,7 @@ public class UserManagementSteps {
         } catch (UserAlreadyExistsException e) {
             ControlReg.getExceptionContainer().setErrorMessage(e.getMessage());
         }
-        assertThat(userService.merchantExists(this.currentUser), equalTo(true));
+        assertTrue(userService.merchantExists(this.currentUser));
     }
 
     @When("the merchant requests to delete the account")
@@ -245,10 +245,13 @@ public class UserManagementSteps {
         this.userService.deleteMerchant(this.currentUser);
     }
 
-    /*
-    * Måske mangler der et step for merchant, @Then (the account was deleted), dette step er dog aktuelt for customer, bruger
-    * disse to users den samme metode til at slette.
-    * */
+    @Then("the merchant account is deleted")
+    public void theMerchantAccountIsDeleted() {
+        // Write code here that turns the phrase above into concrete actions
+
+        assertFalse(userService.merchantExists(this.currentUser));
+    }
+
 
     @After
     public void tearDown(Scenario scenario) throws BankServiceException_Exception {

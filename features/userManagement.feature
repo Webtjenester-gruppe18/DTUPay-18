@@ -21,7 +21,7 @@ Feature: User management feature
   Scenario: A customer wants to delete account
     Given a customer has an account
     When the customer requests to delete the account
-    Then the account will be deleted
+    Then the customer account is deleted
 
   Scenario: A customer adds money to the account
     Given a customer that has an account with balance of 100 kr
@@ -50,5 +50,5 @@ Feature: User management feature
   Scenario: A merchant wants to delete account
     Given the merchant has an account
     When the merchant requests to delete the account
-    Then the account will be deleted
+    Then the merchant account is deleted
 

@@ -72,7 +72,7 @@ public class InMomoryUserDatabase implements IUserDatabase {
     public boolean deleteMerchant(User merchant) {
 
         this.merchants.remove(merchant);
-        
+
         return true;
     }
 }
