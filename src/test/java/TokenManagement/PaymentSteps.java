@@ -41,7 +41,7 @@ public class PaymentSteps {
         this.paymentService = ControlReg.getPaymentService();
     }
 
-    @Given("the customer is registered with an account balance {int}")
+    @Given("a customer is registered with an account balance {int}")
     public void theCustomerIsRegisteredWithAnAccountBalance(Integer balance) {
         Customer customer = new Customer();
         customer.setCprNumber("999999-2200");

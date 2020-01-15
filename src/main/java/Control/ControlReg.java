@@ -27,6 +27,7 @@ public class ControlReg {
         if (userDatabase == null) userDatabase = new InMomoryUserDatabase();
         return userDatabase;
      }
+    private static IReportingService reportingService;
 
     public static IBankService getBankService() {
         if (bank == null) bank = new BankService();
@@ -57,5 +58,10 @@ public class ControlReg {
     public static IPaymentService getPaymentService() {
         if (paymentService == null) paymentService = new PaymentService();
         return paymentService;
+    }
+
+    public static IReportingService getReportingService() {
+        if (reportingService == null) reportingService = new ReportingService();
+        return reportingService;
     }
 }
