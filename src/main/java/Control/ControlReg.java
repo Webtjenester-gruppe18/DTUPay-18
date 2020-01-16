@@ -11,10 +11,12 @@ public class ControlReg {
     private static ITokenManager tokenManager;
     private static dtu.ws.fastmoney.BankService bankService;
     private static IPaymentService paymentService;
+    private static IUserDatabase userDatabase;
     private static IUserService userService;
     private static IUserDatabase userDatabase;
     private static IReportingService reportingService;
     private static IReportDatabase reportDatabase;
+    private static IReportingService reportingService;
 
     public static IUserService getUserService() {
         if (userService == null) userService = new UserService();

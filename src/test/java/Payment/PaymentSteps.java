@@ -11,7 +11,6 @@ import Exception.TokenValidationException;
 import Model.Token;
 import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankServiceException_Exception;
-import dtu.ws.fastmoney.User;
 import io.cucumber.core.api.Scenario;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
