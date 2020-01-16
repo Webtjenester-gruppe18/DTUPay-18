@@ -25,16 +25,12 @@ import static org.junit.Assert.assertEquals;
 
 public class CustomerReportSteps {
 
-    private IBankService bankService;
     private IReportingService reportingService;
     private Customer currentCustomer;
-    private String accountId;
     private ArrayList<CustomerReportTransaction> customerTransactions;
-
 
     @Before
     public void setUp() {
-        this.bankService = ControlReg.getBankService();
         this.reportingService = ControlReg.getReportingService();
     }
 
@@ -103,8 +99,5 @@ public class CustomerReportSteps {
 
     @After
     public void tearDown() throws BankServiceException_Exception {
-        if (this.accountId != null) {
-            this.bankService.retireAccount(this.accountId);
-        }
     }
 }

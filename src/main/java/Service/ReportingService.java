@@ -52,7 +52,6 @@ public class ReportingService implements IReportingService {
             }
         }
 
-
         return result;
     }
 

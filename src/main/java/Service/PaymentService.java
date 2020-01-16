@@ -59,7 +59,6 @@ public class PaymentService implements IPaymentService {
         this.userService.addTransactionToUserByAccountId(transaction.getDebtor(), transaction.getTransactionId());
         this.userService.addTransactionToUserByAccountId(transaction.getCreditor(), transaction.getTransactionId());
 
-
         return true;
     }
 
