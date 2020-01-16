@@ -57,12 +57,50 @@ public class ReportingService implements IReportingService {
 
     @Override
     public ArrayList<MerchantReportTransaction> getMerchantTransactionsByIds(Merchant merchant) {
-        return null;
+
+        ArrayList<MerchantReportTransaction> result = new ArrayList<>();
+
+        for (String transactionId : merchant.getTransactionIds()) {
+            DTUPayTransaction transaction = this.reportDatabase.getTransactionById(transactionId);
+
+            MerchantReportTransaction merchantReportTransaction =
+                    new MerchantReportTransaction(
+                            transaction.getAmount(),
+                            transaction.getDescription(),
+                            transaction.getTime(),
+                            transaction.getToken());
+
+            result.add(merchantReportTransaction);
+        }
+
+        return result;
+    }
+
+    @Override
+    public ArrayList<MerchantReportTransaction> getMerchantTransactionsByIdsFromThenToNow(Merchant merchant, long fromTime) {
+        ArrayList<MerchantReportTransaction> result = new ArrayList<>();
+
+        for (String transactionId : merchant.getTransactionIds()) {
+            DTUPayTransaction transaction = this.reportDatabase.getTransactionById(transactionId);
+
+            if (transaction.getTime() > new Date().getTime() - fromTime) {
+                MerchantReportTransaction merchantReportTransaction =
+                        new MerchantReportTransaction(
+                                transaction.getAmount(),
+                                transaction.getDescription(),
+                                transaction.getTime(),
+                                transaction.getToken());
+
+                result.add(merchantReportTransaction);
+            }
+        }
+
+        return result;
     }
 
     @Override
     public ArrayList<DTUPayTransaction> getAllTransactions() {
-        return null;
+        return this.reportDatabase.getAllTransactions();
     }
 
     @Override

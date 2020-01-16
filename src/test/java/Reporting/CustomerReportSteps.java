@@ -1,10 +1,7 @@
 package Reporting;
 
 import Control.ControlReg;
-import Model.Customer;
-import Model.CustomerReportTransaction;
-import Model.DTUPayTransaction;
-import Model.Token;
+import Model.*;
 import Service.IBankService;
 import Service.IReportingService;
 import Utillity.Utillity;
@@ -27,7 +24,9 @@ public class CustomerReportSteps {
 
     private IReportingService reportingService;
     private Customer currentCustomer;
+    private Merchant currentMerchant;
     private ArrayList<CustomerReportTransaction> customerTransactions;
+    private ArrayList<MerchantReportTransaction> merchantReportTransactions;
 
     @Before
     public void setUp() {
@@ -95,6 +94,71 @@ public class CustomerReportSteps {
     @When("the customer requests for an monthly overview")
     public void theCustomerRequestsForAnMonthlyOverview() {
         this.customerTransactions = this.reportingService.getCustomerTransactionsByIdsFromThenToNow(this.currentCustomer, Utillity.MONTH_IN_MILLIS);
+    }
+
+    @Given("a registered merchant with an account")
+    public void aRegisteredMerchantWithAnAccount() {
+        Merchant merchant = new Merchant("AccountId", "John", "Doe", "0000-000");
+
+        this.currentMerchant = merchant;
+    }
+
+    @Given("the merchant has performed atleast one transaction")
+    public void theMerchantHasPerformedAtleastOneTransaction() {
+        DTUPayTransaction transaction =
+                new DTUPayTransaction(
+                        BigDecimal.valueOf(2222),
+                        this.currentMerchant.getAccountId(),
+                        "Some Value",
+                        "Comment",
+                        new Date().getTime(),
+                        new Token());
+
+        String transactionId = this.reportingService.saveTransaction(transaction);
+
+        this.currentMerchant.getTransactionIds().add(transactionId);
+
+        assertEquals(1, this.currentMerchant.getTransactionIds().size());
+    }
+
+    @When("the merchant requests for an transaction overview")
+    public void theMerchantRequestsForAnTransactionOverview() {
+        this.merchantReportTransactions = this.reportingService.getMerchantTransactionsByIds(this.currentMerchant);
+    }
+
+    @Then("an merchant transaction overview is created")
+    public void anMerchantTransactionOverviewIsCreated() {
+        assertEquals(1, this.merchantReportTransactions.size());
+    }
+
+
+    @Given("the merchant has performed one transaction in the last month")
+    public void theMerchantHasPerformedOneTransactionInTheLastMonth() {
+        DTUPayTransaction transaction =
+                new DTUPayTransaction(
+                        BigDecimal.valueOf(2222),
+                        this.currentMerchant.getAccountId(),
+                        "Some Value",
+                        "Comment",
+                        new Date().getTime(),
+                        new Token());
+
+        String transactionId = this.reportingService.saveTransaction(transaction);
+
+        this.currentMerchant.getTransactionIds().add(transactionId);
+
+        assertEquals(1, this.currentMerchant.getTransactionIds().size());
+    }
+
+    @When("the merchant requests for an monthly overview")
+    public void theMerchantRequestsForAnMonthlyOverview() {
+        this.merchantReportTransactions =
+                this.reportingService.getMerchantTransactionsByIdsFromThenToNow(this.currentMerchant, Utillity.MONTH_IN_MILLIS);
+    }
+
+    @Then("an monthly merchant transaction report is created")
+    public void anMonthlyMerchantTransactionReportIsCreated() {
+        assertEquals(1, this.merchantReportTransactions.size());
     }
 
     @After

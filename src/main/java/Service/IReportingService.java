@@ -13,6 +13,7 @@ public interface IReportingService {
     ArrayList<CustomerReportTransaction> getCustomerTransactionsByIds(Customer customer);
     ArrayList<CustomerReportTransaction> getCustomerTransactionsByIdsFromThenToNow(Customer customer, long fromTime);
     ArrayList<MerchantReportTransaction> getMerchantTransactionsByIds(Merchant merchant);
+    ArrayList<MerchantReportTransaction> getMerchantTransactionsByIdsFromThenToNow(Merchant merchant, long fromTime);
     ArrayList<DTUPayTransaction> getAllTransactions();
     String saveTransaction(DTUPayTransaction transaction);
 
