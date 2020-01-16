@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class CustomerReportSteps {
+public class ReportingSteps {
 
     private IReportingService reportingService;
     private Customer currentCustomer;
